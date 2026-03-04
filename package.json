@@ -1,5 +1,5 @@
 {
-  "name": "dyform",
+  "name": "pdform",
   "exports": {
     "./core": {
       "types": "./packages/core/src/index.ts",
@@ -21,10 +21,10 @@
     "lint:all": "turbo run lint"
   },
   "license": "MIT",
-  "homepage": "https://github.com/LaoChen1994/dyform",
+  "homepage": "https://github.com/LaoChen1994/pdform",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LaoChen1994/dyform"
+    "url": "https://github.com/LaoChen1994/pdform"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",

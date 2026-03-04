@@ -1,5 +1,5 @@
 {
-  "name": "dyform-react",
+  "name": "pdform-react",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,21 +8,21 @@
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/LaoChen1994/dyform",
+  "homepage": "https://github.com/LaoChen1994/pdform",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LaoChen1994/dyform"
+    "url": "https://github.com/LaoChen1994/pdform"
   },
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external dyform",
-    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external dyform",
+    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external pdform",
+    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external pdform",
     "test": "vitest run",
     "lint": "eslint src/**/*.{ts,tsx} --no-error-on-unmatched-pattern"
   },
   "dependencies": {
     "clsx": "^2.0.0",
     "lucide-react": "^0.300.0",
-    "dyform": "workspace:*",
+    "pdform": "workspace:*",
     "tailwind-merge": "^2.0.0"
   },
   "peerDependencies": {

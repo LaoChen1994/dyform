@@ -1,5 +1,5 @@
 {
-  "name": "dyform-vue",
+  "name": "pdform-vue",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,10 +8,10 @@
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/LaoChen1994/dyform",
+  "homepage": "https://github.com/LaoChen1994/pdform",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LaoChen1994/dyform"
+    "url": "https://github.com/LaoChen1994/pdform"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.json --declaration --emitDeclarationOnly --outDir dist",
@@ -22,7 +22,7 @@
   "dependencies": {
     "clsx": "^2.0.0",
     "lucide-vue-next": "^0.300.0",
-    "dyform": "workspace:*",
+    "pdform": "workspace:*",
     "tailwind-merge": "^2.0.0"
   },
   "peerDependencies": {

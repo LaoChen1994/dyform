@@ -1,5 +1,5 @@
 {
-  "name": "dyform-core",
+  "name": "pdform-core",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,10 +8,10 @@
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/LaoChen1994/dyform",
+  "homepage": "https://github.com/LaoChen1994/pdform",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LaoChen1994/dyform"
+    "url": "https://github.com/LaoChen1994/pdform"
   },
   "scripts": {
     "build": "tsup",
@@ -20,7 +20,7 @@
     "lint": "eslint src/**/*.ts --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "dyform": "workspace:*"
+    "pdform": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

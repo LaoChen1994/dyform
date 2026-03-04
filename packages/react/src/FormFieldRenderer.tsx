@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormField } from 'dyform/core';
+import { FormField } from 'pdform/core';
 
 interface FormFieldRendererProps {
   field: FormField;
