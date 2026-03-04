@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FormSchema, validateField, getDefaultValues } from 'pd-dynamic-form/core';
+import { FormSchema, validateField, getDefaultValues } from 'dyform/core';
 import { FormFieldRenderer } from './FormFieldRenderer';
 
 interface DynamicFormProps {

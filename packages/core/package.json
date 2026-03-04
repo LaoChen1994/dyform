@@ -1,5 +1,5 @@
 {
-  "name": "pd-dynamic-form-core",
+  "name": "dyform-core",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
     "lint": "eslint src/**/*.ts --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "pd-dynamic-form": "workspace:*"
+    "dyform": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

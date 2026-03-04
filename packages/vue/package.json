@@ -1,5 +1,5 @@
 {
-  "name": "pd-dynamic-form-vue",
+  "name": "dyform-vue",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
   "dependencies": {
     "clsx": "^2.0.0",
     "lucide-vue-next": "^0.300.0",
-    "pd-dynamic-form": "workspace:*",
+    "dyform": "workspace:*",
     "tailwind-merge": "^2.0.0"
   },
   "peerDependencies": {

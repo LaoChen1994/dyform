@@ -50,7 +50,7 @@ importers:
 
   packages/core:
     dependencies:
-      pd-dynamic-form:
+      dyform:
         specifier: workspace:*
         version: link:../..
     devDependencies:
@@ -69,12 +69,12 @@ importers:
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
+      dyform:
+        specifier: workspace:*
+        version: link:../..
       lucide-react:
         specifier: ^0.300.0
         version: 0.300.0(react@18.3.1)
-      pd-dynamic-form:
-        specifier: workspace:*
-        version: link:../..
       tailwind-merge:
         specifier: ^2.0.0
         version: 2.6.1
@@ -118,12 +118,12 @@ importers:
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
+      dyform:
+        specifier: workspace:*
+        version: link:../..
       lucide-vue-next:
         specifier: ^0.300.0
         version: 0.300.0(vue@3.5.29(typescript@5.9.3))
-      pd-dynamic-form:
-        specifier: workspace:*
-        version: link:../..
       tailwind-merge:
         specifier: ^2.0.0
         version: 2.6.1

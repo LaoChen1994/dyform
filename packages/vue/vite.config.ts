@@ -11,18 +11,18 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
     rollupOptions: {
-      external: ['vue', 'pd-dynamic-form/core'],
+      external: ['vue', 'dyform/core'],
       output: {
         globals: {
           vue: 'Vue',
-          'pd-dynamic-form/core': 'PdDynamicFormCore',
+          'dyform/core': 'DyformCore',
         },
       },
     },
   },
   resolve: {
     alias: {
-      'pd-dynamic-form/core': path.resolve(__dirname, '../core/src'),
+      'dyform/core': path.resolve(__dirname, '../core/src'),
     },
   },
 });

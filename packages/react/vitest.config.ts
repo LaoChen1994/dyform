@@ -10,7 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'pd-dynamic-form/core': path.resolve(__dirname, '../core/src'),
+      'dyform/core': path.resolve(__dirname, '../core/src'),
     },
   },
 });

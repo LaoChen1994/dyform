@@ -1,5 +1,5 @@
 {
-  "name": "pd-dynamic-form-react",
+  "name": "dyform-react",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,15 +9,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external pd-dynamic-form",
-    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external pd-dynamic-form",
+    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external dyform",
+    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external dyform",
     "test": "vitest run",
     "lint": "eslint src/**/*.{ts,tsx} --no-error-on-unmatched-pattern"
   },
   "dependencies": {
     "clsx": "^2.0.0",
     "lucide-react": "^0.300.0",
-    "pd-dynamic-form": "workspace:*",
+    "dyform": "workspace:*",
     "tailwind-merge": "^2.0.0"
   },
   "peerDependencies": {

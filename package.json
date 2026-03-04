@@ -1,6 +1,5 @@
 {
-  "name": "pd-dynamic-form",
-  "private": true,
+  "name": "dyform",
   "exports": {
     "./core": {
       "types": "./packages/core/src/index.ts",
@@ -20,6 +19,11 @@
     "dev:all": "turbo run dev",
     "test:all": "turbo run test",
     "lint:all": "turbo run lint"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LaoChen1994/dyform"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",

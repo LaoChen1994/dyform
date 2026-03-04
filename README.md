@@ -1,12 +1,12 @@
-# pd-dynamic-form
+# dyform
 
 A high-performance, schema-driven dynamic form system with React and Vue support.
 
 ## Packages
 
-- `pd-dynamic-form-core`: Framework-agnostic logic and schema parser.
-- `pd-dynamic-form-react`: React components based on Shadcn UI.
-- `pd-dynamic-form-vue`: Vue components based on Shadcn-vue.
+- `dyform-core`: Framework-agnostic logic and schema parser.
+- `dyform-react`: React components based on Shadcn UI.
+- `dyform-vue`: Vue components based on Shadcn-vue.
 
 ## Development
 
@@ -24,11 +24,11 @@ This package provides a unified entry point. You can import framework-specific c
 
 ```typescript
 // Core logic
-import { validateField } from 'pd-dynamic-form/core';
+import { validateField } from 'dyform/core';
 
 // React components
-import { DynamicForm } from 'pd-dynamic-form/react';
+import { DynamicForm } from 'dyform/react';
 
 // Vue components
-import { DynamicForm } from 'pd-dynamic-form/vue';
+import { DynamicForm } from 'dyform/vue';
 ```
