@@ -9,11 +9,17 @@
     "json-schema",
     "form-builder"
   ],
+  "files": [
+    "README.md",
+    "packages/core/dist/**",
+    "packages/react/dist/**",
+    "packages/vue/dist/**"
+  ],
   "exports": {
     "./core": {
       "types": "./packages/core/dist/index.d.ts",
-      "import": "./packages/core/dist/index.mjs",
-      "require": "./packages/core/dist/index.js"
+      "import": "./packages/core/dist/index.js",
+      "require": "./packages/core/dist/index.cjs"
     },
     "./react": {
       "types": "./packages/react/dist/index.d.ts",

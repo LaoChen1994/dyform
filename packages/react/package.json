@@ -21,8 +21,8 @@
     "url": "https://github.com/LaoChen1994/pdyform"
   },
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external pdyform",
-    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external pdyform",
+    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external react-dom --external pdyform --external @radix-ui/react-checkbox --external @radix-ui/react-label --external @radix-ui/react-radio-group --external @radix-ui/react-select --external lucide-react --external class-variance-authority --external clsx --external tailwind-merge",
+    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external react-dom --external pdyform --external @radix-ui/react-checkbox --external @radix-ui/react-label --external @radix-ui/react-radio-group --external @radix-ui/react-select --external lucide-react --external class-variance-authority --external clsx --external tailwind-merge",
     "test": "vitest run",
     "lint": "eslint src/**/*.{ts,tsx} --no-error-on-unmatched-pattern"
   },

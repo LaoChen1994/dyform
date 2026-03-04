@@ -2,6 +2,8 @@ import { Component } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { DefineComponent } from 'vue';
+import { FormField } from 'pdyform/core';
+import { FormSchema } from 'pdyform/core';
 import { PublicProps } from 'vue';
 
 declare type __VLS_Props = {
@@ -53,46 +55,10 @@ export declare interface FieldRendererProps {
     fieldId: string;
 }
 
-declare type FieldType = 'text' | 'number' | 'email' | 'password' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'date';
-
-declare interface FormField {
-    id: string;
-    name: string;
-    label: string;
-    type: FieldType;
-    placeholder?: string;
-    description?: string;
-    defaultValue?: any;
-    options?: Option_2[]; // For select, radio, checkbox
-    validations?: ValidationRule[];
-    hidden?: boolean;
-    disabled?: boolean;
-    className?: string; // CSS class for custom styling
-}
-
 export declare const FormFieldRenderer: DefineComponent<__VLS_Props_2, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "update:modelValue": (...args: any[]) => void;
 }, string, PublicProps, Readonly<__VLS_Props_2> & Readonly<{
 "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
-
-declare interface FormSchema {
-    title?: string;
-    description?: string;
-    fields: FormField[];
-    submitButtonText?: string;
-}
-
-declare interface Option_2 {
-    label: string;
-    value: string | number;
-}
-
-declare interface ValidationRule {
-    type: 'required' | 'min' | 'max' | 'pattern' | 'email' | 'custom';
-    value?: any;
-    message?: string;
-    validator?: (value: any) => boolean | string;
-}
 
 export { }
