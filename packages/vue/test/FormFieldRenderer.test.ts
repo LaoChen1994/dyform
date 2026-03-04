@@ -9,6 +9,7 @@ describe('FormFieldRenderer', () => {
     name: 'testField',
     label: 'Test Label',
     type: 'text',
+    id: 'test-field-id',
   };
 
   it('renders a text input correctly', async () => {
@@ -51,10 +52,13 @@ describe('FormFieldRenderer', () => {
       props: { field, modelValue: 'opt1' }
     });
     
-    const select = wrapper.find('select');
-    expect((select.element as HTMLSelectElement).value).toBe('opt1');
+    // Radix Select renders a combobox trigger
+    expect(wrapper.find('[role="combobox"]').exists()).toBe(true);
+
+    // Simulate the SelectField emitting the new value (Radix portal doesn't fully function in jsdom)
+    const selectField = wrapper.findComponent({ name: 'Select' });
+    await selectField.vm.$emit('update:modelValue', 'opt2');
     
-    await select.setValue('opt2');
     expect(wrapper.emitted('update:modelValue')![0]).toEqual(['opt2']);
   });
 
@@ -71,11 +75,14 @@ describe('FormFieldRenderer', () => {
       props: { field, modelValue: ['c1'] }
     });
     
-    const checkboxes = wrapper.findAll('input[type="checkbox"]');
-    expect((checkboxes[0].element as HTMLInputElement).checked).toBe(true);
-    expect((checkboxes[1].element as HTMLInputElement).checked).toBe(false);
+    const checkboxes = wrapper.findAll('[role="checkbox"]');
+    expect(checkboxes[0].attributes('data-state')).toBe('checked');
+    expect(checkboxes[1].attributes('data-state')).toBe('unchecked');
     
-    await checkboxes[1].setValue(true);
+    // Emit from the internal CheckboxComponent logic since Radix click simulation can be tricky with simple DOM wrapper
+    const checkboxComponents = wrapper.findAllComponents({ name: 'Checkbox' });
+    await checkboxComponents[1].vm.$emit('update:checked', true);
+
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([['c1', 'c2']]);
   });
 
@@ -92,11 +99,14 @@ describe('FormFieldRenderer', () => {
       props: { field, modelValue: 'r1' }
     });
     
-    const radios = wrapper.findAll('input[type="radio"]');
-    expect((radios[0].element as HTMLInputElement).checked).toBe(true);
-    expect((radios[1].element as HTMLInputElement).checked).toBe(false);
+    const radios = wrapper.findAll('[role="radio"]');
+    expect(radios[0].attributes('data-state')).toBe('checked');
+    expect(radios[1].attributes('data-state')).toBe('unchecked');
     
-    await radios[1].setValue(true);
+    // Radix Vue uses a radio group component wrapper for selecting
+    const radioGroupComp = wrapper.findComponent({ name: 'RadioGroup' });
+    await radioGroupComp.vm.$emit('update:modelValue', 'r2');
+    
     expect(wrapper.emitted('update:modelValue')![0]).toEqual(['r2']);
   });
 

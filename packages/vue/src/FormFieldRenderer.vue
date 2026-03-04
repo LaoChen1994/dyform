@@ -1,114 +1,70 @@
 <script setup lang="ts">
 import type { FormField } from 'pdyform/core';
+import type { Component } from 'vue';
 import { computed } from 'vue';
+import { defaultComponentMap, type FieldComponentMap } from './fieldComponentMap';
+import Label from './components/Label.vue';
+import InputRenderer from './components/InputRenderer.vue';
 
 const props = defineProps<{
   field: FormField;
   modelValue: any;
   error?: string;
+  /**
+   * Custom component map.
+   * Entries here are merged with the default map, so you can override
+   * specific types or add entirely new ones.
+   *
+   * @example
+   * ```ts
+   * import { defaultComponentMap } from 'pdyform-vue';
+   * const myMap = {
+   *   ...defaultComponentMap,
+   *   text: MyCustomInput,       // overrides built-in text input
+   *   rating: StarRatingField,   // adds a new field type
+   * };
+   * ```
+   */
+  componentMap?: FieldComponentMap;
 }>();
 
 const emit = defineEmits(['update:modelValue']);
 
 const fieldId = computed(() => `field-${props.field.name}`);
 
-const baseInputClasses = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+// Merge external map over defaults — external wins
+const resolvedMap = computed<FieldComponentMap>(() =>
+  props.componentMap
+    ? { ...defaultComponentMap, ...props.componentMap }
+    : defaultComponentMap
+);
 
-const handleUpdate = (val: any) => {
-  emit('update:modelValue', val);
-};
-
-const handleCheckboxChange = (val: any, checked: boolean) => {
-  const current = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
-  if (checked) {
-    current.push(val);
-  } else {
-    const idx = current.indexOf(val);
-    if (idx > -1) current.splice(idx, 1);
-  }
-  handleUpdate(current);
-};
+// Resolve a component or fall back to InputRenderer
+const ResolvedFieldComponent = computed<Component>(
+  () => resolvedMap.value[props.field.type] ?? InputRenderer
+);
 </script>
 
 <template>
   <div :class="['space-y-2', field.className]">
-    <label v-if="field.label" :for="fieldId" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+    <Label v-if="field.label" :for="fieldId">
       {{ field.label }}
-    </label>
+    </Label>
 
-    <template v-if="field.type === 'textarea'">
-      <textarea
-        :id="fieldId"
-        :class="[baseInputClasses, 'min-h-[80px]']"
-        :placeholder="field.placeholder"
-        :disabled="field.disabled"
-        :name="field.name"
-        :value="modelValue"
-        @input="(e: any) => handleUpdate(e.target.value)"
-      />
-    </template>
+    <!-- All field rendering is delegated to the resolved component -->
+    <component
+      :is="ResolvedFieldComponent"
+      :field="field"
+      :fieldId="fieldId"
+      :modelValue="modelValue"
+      @update:modelValue="emit('update:modelValue', $event)"
+    />
 
-    <template v-else-if="field.type === 'select'">
-      <select
-        :id="fieldId"
-        :class="baseInputClasses"
-        :disabled="field.disabled"
-        :name="field.name"
-        :value="modelValue"
-        @change="(e: any) => handleUpdate(e.target.value)"
-      >
-        <option value="" disabled>{{ field.placeholder || 'Select an option' }}</option>
-        <option v-for="opt in field.options" :key="opt.value" :value="opt.value">
-          {{ opt.label }}
-        </option>
-      </select>
-    </template>
-
-    <template v-else-if="field.type === 'checkbox'">
-      <div class="flex flex-wrap gap-4">
-        <label v-for="opt in field.options" :key="opt.value" class="flex items-center space-x-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          <input
-            type="checkbox"
-            class="h-4 w-4 rounded border-primary text-primary focus:ring-primary"
-            :disabled="field.disabled"
-            :checked="Array.isArray(modelValue) && modelValue.includes(opt.value)"
-            @change="(e: any) => handleCheckboxChange(opt.value, e.target.checked)"
-          />
-          <span>{{ opt.label }}</span>
-        </label>
-      </div>
-    </template>
-
-    <template v-else-if="field.type === 'radio'">
-      <div class="flex flex-wrap gap-4">
-        <label v-for="opt in field.options" :key="opt.value" class="flex items-center space-x-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          <input
-            type="radio"
-            class="h-4 w-4 border-primary text-primary focus:ring-primary"
-            :disabled="field.disabled"
-            :name="field.name"
-            :checked="modelValue === opt.value"
-            @change="handleUpdate(opt.value)"
-          />
-          <span>{{ opt.label }}</span>
-        </label>
-      </div>
-    </template>
-
-    <template v-else>
-      <input
-        :id="fieldId"
-        :type="field.type"
-        :class="baseInputClasses"
-        :placeholder="field.placeholder"
-        :disabled="field.disabled"
-        :name="field.name"
-        :value="modelValue"
-        @input="(e: any) => handleUpdate(e.target.value)"
-      />
-    </template>
-
-    <p v-if="field.description" class="text-sm text-muted-foreground">{{ field.description }}</p>
-    <p v-if="error" class="text-sm font-medium text-destructive">{{ error }}</p>
+    <p v-if="field.description" class="text-[0.8rem] text-muted-foreground">
+      {{ field.description }}
+    </p>
+    <p v-if="error" class="text-[0.8rem] font-medium text-destructive">
+      {{ error }}
+    </p>
   </div>
 </template>

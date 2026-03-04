@@ -10,6 +10,7 @@ describe('FormFieldRenderer', () => {
     name: 'testField',
     label: 'Test Label',
     type: 'text',
+    id: 'test-field-id',
   };
 
   it('renders a text input correctly', () => {
@@ -45,10 +46,17 @@ describe('FormFieldRenderer', () => {
     const onChange = vi.fn();
     render(<FormFieldRenderer field={field} value="opt1" onChange={onChange} />);
     
-    const select = screen.getByLabelText('Test Label') as HTMLSelectElement;
-    expect(select.value).toBe('opt1');
+    // Radix Select Trigger is a button (combobox)
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.textContent).toContain('Option 1');
     
-    fireEvent.change(select, { target: { value: 'opt2' } });
+    // Open select to trigger change
+    fireEvent.click(trigger);
+    
+    // Select Option 2
+    const option2 = screen.getByRole('option', { name: 'Option 2' });
+    fireEvent.click(option2);
+    
     expect(onChange).toHaveBeenCalledWith('opt2');
   });
 
@@ -64,11 +72,11 @@ describe('FormFieldRenderer', () => {
     const onChange = vi.fn();
     render(<FormFieldRenderer field={field} value={['c1']} onChange={onChange} />);
     
-    const checkbox1 = screen.getByLabelText('Check 1') as HTMLInputElement;
-    const checkbox2 = screen.getByLabelText('Check 2') as HTMLInputElement;
+    const checkbox1 = screen.getByRole('checkbox', { name: 'Check 1' });
+    const checkbox2 = screen.getByRole('checkbox', { name: 'Check 2' });
     
-    expect(checkbox1.checked).toBe(true);
-    expect(checkbox2.checked).toBe(false);
+    expect(checkbox1.getAttribute('aria-checked')).toBe('true');
+    expect(checkbox2.getAttribute('aria-checked')).toBe('false');
     
     fireEvent.click(checkbox2);
     expect(onChange).toHaveBeenCalledWith(['c1', 'c2']);
@@ -89,11 +97,11 @@ describe('FormFieldRenderer', () => {
     const onChange = vi.fn();
     render(<FormFieldRenderer field={field} value="r1" onChange={onChange} />);
     
-    const radio1 = screen.getByLabelText('Radio 1') as HTMLInputElement;
-    const radio2 = screen.getByLabelText('Radio 2') as HTMLInputElement;
+    const radio1 = screen.getByRole('radio', { name: 'Radio 1' });
+    const radio2 = screen.getByRole('radio', { name: 'Radio 2' });
     
-    expect(radio1.checked).toBe(true);
-    expect(radio2.checked).toBe(false);
+    expect(radio1.getAttribute('aria-checked')).toBe('true');
+    expect(radio2.getAttribute('aria-checked')).toBe('false');
     
     fireEvent.click(radio2);
     expect(onChange).toHaveBeenCalledWith('r2');
