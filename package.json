@@ -2,16 +2,19 @@
   "name": "pdyform",
   "exports": {
     "./core": {
-      "types": "./packages/core/src/index.ts",
-      "import": "./packages/core/src/index.ts"
+      "types": "./packages/core/dist/index.d.ts",
+      "import": "./packages/core/dist/index.mjs",
+      "require": "./packages/core/dist/index.js"
     },
     "./react": {
-      "types": "./packages/react/src/index.tsx",
-      "import": "./packages/react/src/index.tsx"
+      "types": "./packages/react/dist/index.d.ts",
+      "import": "./packages/react/dist/index.js",
+      "require": "./packages/react/dist/index.cjs"
     },
     "./vue": {
-      "types": "./packages/vue/src/index.ts",
-      "import": "./packages/vue/src/index.ts"
+      "types": "./packages/vue/dist/index.d.ts",
+      "import": "./packages/vue/dist/index.mjs",
+      "require": "./packages/vue/dist/index.js"
     }
   },
   "scripts": {
