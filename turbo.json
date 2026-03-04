@@ -5,6 +5,14 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
+    "pdyform-react#build": {
+      "dependsOn": ["pdyform-core#build"],
+      "outputs": ["dist/**"]
+    },
+    "pdyform-vue#build": {
+      "dependsOn": ["pdyform-core#build"],
+      "outputs": ["dist/**"]
+    },
     "lint": {},
     "dev": {
       "cache": false,
