@@ -1,6 +1,6 @@
 {
   "name": "dyform-core",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -8,6 +8,11 @@
   "files": [
     "dist"
   ],
+  "homepage": "https://github.com/LaoChen1994/dyform",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LaoChen1994/dyform"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

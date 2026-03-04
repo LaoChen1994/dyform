@@ -21,6 +21,7 @@
     "lint:all": "turbo run lint"
   },
   "license": "MIT",
+  "homepage": "https://github.com/LaoChen1994/dyform",
   "repository": {
     "type": "git",
     "url": "https://github.com/LaoChen1994/dyform"
@@ -41,5 +42,5 @@
     "vitest": "^1.0.0"
   },
   "packageManager": "pnpm@9.0.0",
-  "version": "0.0.1"
+  "version": "1.0.0"
 }
