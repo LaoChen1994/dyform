@@ -2,6 +2,7 @@
 export { Input } from './Input';
 export { Textarea } from './Textarea';
 export { Checkbox } from './Checkbox';
+export { Switch } from './Switch';
 export { RadioGroup, RadioGroupItem } from './RadioGroup';
 export {
   Select,
@@ -19,6 +20,8 @@ export { default as TextareaRenderer } from './TextareaRenderer';
 export { default as SelectRenderer } from './SelectRenderer';
 export { default as CheckboxRenderer } from './CheckboxRenderer';
 export { default as RadioRenderer } from './RadioRenderer';
+export { default as DateRenderer } from './DateRenderer';
+export { default as SwitchRenderer } from './SwitchRenderer';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type { FieldRenderContext, FieldRenderer, FieldComponentMap } from './types';
@@ -29,6 +32,8 @@ import TextareaRenderer from './TextareaRenderer';
 import SelectRenderer from './SelectRenderer';
 import CheckboxRenderer from './CheckboxRenderer';
 import RadioRenderer from './RadioRenderer';
+import DateRenderer from './DateRenderer';
+import SwitchRenderer from './SwitchRenderer';
 import type { FieldComponentMap } from './types';
 
 /**
@@ -47,9 +52,10 @@ export const defaultComponentMap: FieldComponentMap = {
   number: InputRenderer,
   password: InputRenderer,
   email: InputRenderer,
-  date: InputRenderer,
   textarea: TextareaRenderer,
   select: SelectRenderer,
   checkbox: CheckboxRenderer,
   radio: RadioRenderer,
+  date: DateRenderer,
+  switch: SwitchRenderer,
 };

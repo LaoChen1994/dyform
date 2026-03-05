@@ -10,7 +10,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: any] }>();
   <Textarea
     :id="fieldId"
     :placeholder="field.placeholder"
-    :disabled="field.disabled"
+    :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
     :name="field.name"
     :modelValue="modelValue ?? ''"
     @update:modelValue="emit('update:modelValue', $event)"

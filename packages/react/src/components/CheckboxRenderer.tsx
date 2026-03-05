@@ -12,7 +12,7 @@ const CheckboxRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange
           <Checkbox
             id={`checkbox-${field.name}-${opt.value}`}
             checked={checked}
-            disabled={field.disabled}
+            disabled={typeof field.disabled === 'boolean' ? field.disabled : undefined}
             onCheckedChange={(c) => {
               const next = Array.isArray(value) ? [...value] : [];
               if (c) {

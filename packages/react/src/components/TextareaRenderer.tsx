@@ -9,7 +9,7 @@ const TextareaRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange
     value={value ?? ''}
     onChange={(e) => onChange(e.target.value)}
     onBlur={onBlur}
-    disabled={field.disabled}
+    disabled={typeof field.disabled === 'boolean' ? field.disabled : undefined}
     name={field.name}
   />
 );

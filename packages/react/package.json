@@ -1,47 +1,54 @@
 {
   "name": "pdyform-react",
   "version": "1.0.0",
-  "description": "React components for pdyform based on Shadcn UI.",
-  "keywords": [
-    "dynamic-form",
-    "schema-form",
-    "react",
-    "shadcn"
-  ],
+  "description": "React components for pdyform.",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/LaoChen1994/pdyform",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/LaoChen1994/pdyform"
-  },
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --external react --external react-dom --external pdyform --external @radix-ui/react-checkbox --external @radix-ui/react-label --external @radix-ui/react-radio-group --external @radix-ui/react-select --external lucide-react --external class-variance-authority --external clsx --external tailwind-merge",
-    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external react-dom --external pdyform --external @radix-ui/react-checkbox --external @radix-ui/react-label --external @radix-ui/react-radio-group --external @radix-ui/react-select --external lucide-react --external class-variance-authority --external clsx --external tailwind-merge",
+    "build": "tsup src/index.tsx --format cjs,esm --dts --clean --minify --external react --external react-dom --external pdyform-core",
+    "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external react-dom --external pdyform-core",
     "test": "vitest run",
-    "lint": "eslint src/**/*.{ts,tsx} --no-error-on-unmatched-pattern"
+    "lint": "eslint src/**/*.{ts,tsx} --no-error-on-unmatched-pattern",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-radio-group": "^1.3.8",
     "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-switch": "^1.2.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.300.0",
-    "pdyform": "workspace:*",
-    "tailwind-merge": "^2.6.1"
+    "pdyform-core": "workspace:*",
+    "tailwind-merge": "^2.6.1",
+    "zustand": "^5.0.11"
   },
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "8.6.17",
+    "@storybook/addon-interactions": "8.6.17",
+    "@storybook/addon-onboarding": "8.6.17",
+    "@storybook/blocks": "8.6.17",
+    "@storybook/react": "8.6.17",
+    "@storybook/react-vite": "8.6.17",
+    "@storybook/test": "8.6.17",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^18.0.0",
@@ -50,6 +57,7 @@
     "jsdom": "^22.1.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "storybook": "8.6.17",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"

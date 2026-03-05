@@ -6,7 +6,7 @@ const SelectRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange, 
   <Select
     value={value != null ? String(value) : ''}
     onValueChange={onChange}
-    disabled={field.disabled}
+    disabled={typeof field.disabled === 'boolean' ? field.disabled : undefined}
     name={field.name}
   >
     <SelectTrigger id={fieldId} onBlur={onBlur}>

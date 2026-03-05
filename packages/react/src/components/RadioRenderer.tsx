@@ -7,7 +7,7 @@ const RadioRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange, o
   <RadioGroup
     value={value != null ? String(value) : ''}
     onValueChange={onChange}
-    disabled={field.disabled}
+    disabled={typeof field.disabled === 'boolean' ? field.disabled : undefined}
     name={field.name}
     className="flex flex-wrap gap-4"
   >

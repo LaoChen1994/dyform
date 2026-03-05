@@ -1,36 +1,57 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { FormSchema, FormRuntimeState } from 'pdyform/core';
-import {
-  createFormRuntimeState,
-  applyFieldChange,
-  runSubmitValidation,
-  setSubmitting,
-} from 'pdyform/core';
+import { computed } from 'vue';
+import type { FormSchema } from 'pdyform-core';
+import { get } from 'pdyform-core';
 import FormFieldRenderer from './FormFieldRenderer.vue';
+import { useForm, type UseFormReturn } from './useForm';
 
 const props = defineProps<{
   schema: FormSchema;
   className?: string;
+  form?: UseFormReturn;
 }>();
 
 const emit = defineEmits(['submit']);
 
-const formState = ref<FormRuntimeState>(createFormRuntimeState(props.schema.fields));
+const internalForm = useForm({ schema: props.schema });
+const form = props.form || internalForm;
+const { store, state: formState } = form;
 
-const handleFieldChange = (name: string, value: any) => {
-  formState.value = applyFieldChange(props.schema.fields, formState.value, name, value);
+const handleFieldChange = async (name: string, value: any) => {
+  await store.getState().setFieldValue(name, value);
 };
 
-const handleSubmit = () => {
-  const submittingState = setSubmitting(formState.value, true);
-  const { state: validatedState, hasError } = runSubmitValidation(props.schema.fields, submittingState);
-  formState.value = validatedState;
+const handleFieldBlur = async (name: string) => {
+  await store.getState().setFieldBlur(name);
+};
 
-  if (!hasError) {
-    emit('submit', { ...validatedState.values });
+const isFieldHidden = (field: any) => {
+  return typeof field.hidden === 'function' ? field.hidden(formState.value.values) : !!field.hidden;
+};
+
+const getFieldWithDisabled = (field: any) => {
+  const isDisabled = typeof field.disabled === 'function' ? field.disabled(formState.value.values) : !!field.disabled;
+  const isValidating = formState.value.validatingFields.includes(field.name);
+  return { ...field, disabled: isDisabled || isValidating };
+};
+
+const handleSubmit = async () => {
+  const { hasError, values } = await form.validate();
+  
+  if (hasError) {
+    const firstErrorField = props.schema.fields.find(f => formState.value.errors[f.name]);
+    if (firstErrorField) {
+      const element = document.getElementById(`field-${firstErrorField.name}`);
+      element?.focus();
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
   }
+  
+  emit('submit', values);
 };
+
+const isAnyFieldValidating = computed(() => formState.value.validatingFields.length > 0);
 </script>
 
 <template>
@@ -43,21 +64,22 @@ const handleSubmit = () => {
     <div class="space-y-4">
       <template v-for="field in schema.fields" :key="field.id">
         <FormFieldRenderer
-          v-if="!field.hidden"
-          :field="field"
-          :model-value="formState.values[field.name]"
+          v-if="!isFieldHidden(field)"
+          :field="getFieldWithDisabled(field)"
+          :model-value="get(formState.values, field.name)"
           :error="formState.errors[field.name]"
           @update:model-value="(val: any) => handleFieldChange(field.name, val)"
+          @blur="handleFieldBlur(field.name)"
         />
       </template>
     </div>
 
     <button
       type="submit"
-      :disabled="formState.isSubmitting"
+      :disabled="formState.isSubmitting || isAnyFieldValidating"
       class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
     >
-      {{ formState.isSubmitting ? 'Submitting...' : (schema.submitButtonText || 'Submit') }}
+      {{ formState.isSubmitting ? 'Submitting...' : (isAnyFieldValidating ? 'Validating...' : (schema.submitButtonText || 'Submit')) }}
     </button>
   </form>
 </template>

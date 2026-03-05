@@ -1,5 +1,5 @@
 import React from 'react';
-import type { FormField } from 'pdyform/core';
+import type { FormField } from 'pdyform-core';
 import { Label, defaultComponentMap, InputRenderer } from './components';
 import type { FieldComponentMap } from './components';
 
@@ -30,8 +30,12 @@ export const FormFieldRenderer: React.FC<FormFieldRendererProps> = ({
   error,
   componentMap,
 }) => {
-  const { label, description, name, type } = field;
+  const { label, description, name, type, validations } = field;
   const fieldId = `field-${name}`;
+  const descriptionId = `${fieldId}-description`;
+  const errorId = `${fieldId}-error`;
+
+  const isRequired = validations?.some((v) => v.type === 'required');
 
   const resolvedMap: FieldComponentMap = componentMap
     ? { ...defaultComponentMap, ...componentMap }
@@ -39,12 +43,45 @@ export const FormFieldRenderer: React.FC<FormFieldRendererProps> = ({
 
   const FieldComponent = resolvedMap[type] ?? InputRenderer;
 
+  // Combine multiple IDs into one string for aria-describedby
+  const describedBy = [
+    description ? descriptionId : null,
+    error ? errorId : null,
+  ].filter(Boolean).join(' ');
+
   return (
     <div className={`space-y-2 ${field.className || ''}`}>
-      {label && <Label htmlFor={fieldId}>{label}</Label>}
-      <FieldComponent field={field} value={value} onChange={onChange} onBlur={onBlur} fieldId={fieldId} />
-      {description && <p className="text-[0.8rem] text-muted-foreground">{description}</p>}
-      {error && <p className="text-[0.8rem] font-medium text-destructive">{error}</p>}
+      {label && (
+        <Label htmlFor={fieldId} className={isRequired ? "flex items-center gap-1" : ""}>
+          {label}
+          {isRequired && <span className="text-destructive">*</span>}
+        </Label>
+      )}
+      
+      <FieldComponent
+        field={field}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        fieldId={fieldId}
+        errorId={errorId}
+        descriptionId={descriptionId}
+        ariaInvalid={!!error}
+        ariaRequired={isRequired}
+        ariaDescribedBy={describedBy || undefined}
+      />
+
+      {description && (
+        <p id={descriptionId} className="text-[0.8rem] text-muted-foreground">
+          {description}
+        </p>
+      )}
+      
+      {error && (
+        <p id={errorId} className="text-[0.8rem] font-medium text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

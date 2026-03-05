@@ -11,7 +11,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: any] }>();
 <template>
   <RadioGroup
     class="flex flex-wrap gap-4"
-    :disabled="field.disabled"
+    :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
     :name="field.name"
     :modelValue="modelValue != null ? String(modelValue) : ''"
     @update:modelValue="emit('update:modelValue', $event)"

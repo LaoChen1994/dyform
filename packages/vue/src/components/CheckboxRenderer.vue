@@ -23,7 +23,7 @@ const handleChange = (optValue: any, checked: boolean) => {
     <div v-for="opt in field.options" :key="opt.value" class="flex items-center space-x-2">
       <Checkbox
         :id="`checkbox-${field.name}-${opt.value}`"
-        :disabled="field.disabled"
+        :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
         :checked="Array.isArray(modelValue) && modelValue.includes(opt.value)"
         @update:checked="(checked) => handleChange(opt.value, !!checked)"
       />

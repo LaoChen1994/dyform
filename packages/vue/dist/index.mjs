@@ -1,13 +1,195 @@
-import { defineComponent as f, openBlock as n, createElementBlock as m, normalizeClass as S, unref as s, createBlock as p, computed as h, mergeProps as V, withCtx as r, renderSlot as w, createVNode as c, createElementVNode as I, normalizeProps as z, guardReactiveProps as N, Fragment as $, renderList as B, createTextVNode as C, toDisplayString as v, createCommentVNode as x, resolveDynamicComponent as T, ref as D, withModifiers as j } from "vue";
-import { normalizeFieldValue as q, createFormRuntimeState as G, applyFieldChange as A, setSubmitting as E, runSubmitValidation as L } from "pdyform/core";
-import { clsx as O } from "clsx";
-import { twMerge as W } from "tailwind-merge";
-import { useForwardProps as _, SelectTrigger as H, SelectIcon as J, SelectPortal as K, SelectContent as Q, SelectViewport as X, SelectItem as Y, SelectItemIndicator as Z, SelectItemText as ee, useForwardPropsEmits as P, SelectRoot as te, SelectValue as le, CheckboxRoot as ae, CheckboxIndicator as oe, Label as se, RadioGroupItem as de, RadioGroupIndicator as ne, RadioGroupRoot as ie } from "radix-vue";
-import { ChevronDown as re, Check as U, Circle as ue } from "lucide-vue-next";
-function y(...e) {
-  return W(O(e));
+import { defineComponent as p, openBlock as d, createElementBlock as g, mergeProps as $, unref as o, createBlock as y, computed as h, withCtx as m, renderSlot as q, createVNode as b, normalizeClass as D, createElementVNode as O, normalizeProps as X, guardReactiveProps as Y, Fragment as N, renderList as E, createTextVNode as U, toDisplayString as I, createCommentVNode as R, resolveDynamicComponent as Z, ref as _, onUnmounted as ee, withModifiers as te } from "vue";
+import { clsx as ae } from "clsx";
+import { twMerge as le } from "tailwind-merge";
+import { useForwardProps as j, SelectTrigger as ie, SelectIcon as ne, SelectPortal as se, SelectContent as re, SelectViewport as oe, SelectItem as de, SelectItemIndicator as ue, SelectItemText as ce, useForwardPropsEmits as A, SelectRoot as me, SelectValue as fe, CheckboxRoot as be, CheckboxIndicator as pe, Label as ge, RadioGroupItem as ye, RadioGroupIndicator as ve, RadioGroupRoot as he, SwitchRoot as xe, SwitchThumb as Ve } from "radix-vue";
+import { ChevronDown as ke, Check as W, Circle as we } from "lucide-vue-next";
+function z(e) {
+  if (typeof e == "number") return Number.isNaN(e) ? null : e;
+  if (typeof e != "string" || e.trim() === "") return null;
+  const l = Number(e);
+  return Number.isNaN(l) ? null : l;
 }
-const ce = ["type", "value"], me = /* @__PURE__ */ f({
+var Be = {
+  required: "{label} is required",
+  min: "{label} must be at least {value}",
+  max: "{label} must be at most {value}",
+  email: "Invalid email address",
+  pattern: "Invalid format",
+  custom: "Invalid value"
+};
+function S(e, l, i) {
+  return e.replace("{label}", l.label).replace("{value}", String(i.value || ""));
+}
+function M(e, l, i) {
+  if (!l) return i;
+  const n = l.split(/[.[\]]/).filter(Boolean);
+  let a = e;
+  for (const t of n) {
+    if (a == null) return i;
+    a = a[t];
+  }
+  return a === void 0 ? i : a;
+}
+function Se(e, l, i) {
+  if (Object(e) !== e) return e;
+  const n = l.split(/[.[\]]/).filter(Boolean), a = { ...e };
+  let t = a;
+  for (let r = 0; r < n.length - 1; r++) {
+    const s = n[r], u = n[r + 1], c = /^\d+$/.test(u);
+    !(s in t) || t[s] === null || typeof t[s] != "object" ? t[s] = c ? [] : {} : t[s] = Array.isArray(t[s]) ? [...t[s]] : { ...t[s] }, t = t[s];
+  }
+  return t[n[n.length - 1]] = i, a;
+}
+function H(e, l) {
+  if (e.type !== "number") return l;
+  if (l === "" || l === void 0 || l === null) return "";
+  const i = z(l);
+  return i === null ? l : i;
+}
+async function J(e, l, i) {
+  if (!l.validations) return null;
+  const n = { ...Be, ...i };
+  for (const a of l.validations)
+    switch (a.type) {
+      case "required":
+        if (e == null || e === "" || Array.isArray(e) && e.length === 0)
+          return a.message || S(n.required, l, a);
+        break;
+      case "min":
+        if (l.type === "number") {
+          const t = z(e);
+          if (t !== null && t < a.value) {
+            const r = l.type === "number" ? n.min : typeof e == "string" ? "{label} must be at least {value} characters" : n.min;
+            return a.message || S(r, l, a);
+          }
+          break;
+        }
+        if (typeof e == "number" && e < a.value)
+          return a.message || S(n.min, l, a);
+        if (typeof e == "string" && e.length < a.value)
+          return a.message || S("{label} must be at least {value} characters", l, a);
+        break;
+      case "max":
+        if (l.type === "number") {
+          const t = z(e);
+          if (t !== null && t > a.value)
+            return a.message || S(n.max, l, a);
+          break;
+        }
+        if (typeof e == "number" && e > a.value)
+          return a.message || S(n.max, l, a);
+        if (typeof e == "string" && e.length > a.value)
+          return a.message || S("{label} must be at most {value} characters", l, a);
+        break;
+      case "email": {
+        if (e && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
+          return a.message || S(n.email, l, a);
+        break;
+      }
+      case "pattern":
+        if (e && a.value && !new RegExp(a.value).test(e))
+          return a.message || S(n.pattern, l, a);
+        break;
+      case "custom":
+        if (a.validator) {
+          const t = await a.validator(e);
+          if (typeof t == "string") return t;
+          if (t === !1) return a.message || S(n.custom, l, a);
+        }
+        break;
+    }
+  return null;
+}
+async function G(e, l, i, n, a, t) {
+  if (n && a) {
+    const s = await n(a);
+    if (s[l]) return s[l];
+  }
+  const r = e.find((s) => s.name === l);
+  return r ? await J(i, r, t) : null;
+}
+async function $e(e, l, i, n) {
+  let a = {};
+  i && (a = await i(l));
+  const t = e.map(async (r) => {
+    if (a[r.name]) return;
+    const s = await J(M(l, r.name), r, n);
+    s && (a[r.name] = s);
+  });
+  return await Promise.all(t), a;
+}
+function Ie(e) {
+  return e.reduce((l, i) => (l[i.name] = i.defaultValue !== void 0 ? i.defaultValue : i.type === "checkbox" ? [] : "", l), {});
+}
+const L = (e) => {
+  let l;
+  const i = /* @__PURE__ */ new Set(), n = (c, x) => {
+    const f = typeof c == "function" ? c(l) : c;
+    if (!Object.is(f, l)) {
+      const V = l;
+      l = x ?? (typeof f != "object" || f === null) ? f : Object.assign({}, l, f), i.forEach((F) => F(l, V));
+    }
+  }, a = () => l, s = { setState: n, getState: a, getInitialState: () => u, subscribe: (c) => (i.add(c), () => i.delete(c)) }, u = l = e(n, a, s);
+  return s;
+}, Fe = (e) => e ? L(e) : L;
+function Re(e, l, i) {
+  return Fe()((n, a) => ({
+    values: Ie(e),
+    errors: {},
+    validatingFields: [],
+    isSubmitting: !1,
+    setFieldValue: async (t, r) => {
+      const s = e.find((c) => c.name === t), u = s ? H(s, r) : r;
+      n((c) => ({
+        values: Se(c.values, t, u),
+        validatingFields: [...c.validatingFields, t]
+      }));
+      try {
+        const c = a().values, x = await G(e, t, u, l, c, i);
+        n((f) => ({
+          errors: { ...f.errors, [t]: x || "" },
+          validatingFields: f.validatingFields.filter((V) => V !== t)
+        }));
+      } catch {
+        n((x) => ({
+          validatingFields: x.validatingFields.filter((f) => f !== t)
+        }));
+      }
+    },
+    setFieldBlur: async (t) => {
+      n((r) => ({
+        validatingFields: [...r.validatingFields, t]
+      }));
+      try {
+        const r = a().values, s = M(r, t), u = await G(e, t, s, l, r, i);
+        n((c) => ({
+          errors: { ...c.errors, [t]: u || "" },
+          validatingFields: c.validatingFields.filter((x) => x !== t)
+        }));
+      } catch {
+        n((s) => ({
+          validatingFields: s.validatingFields.filter((u) => u !== t)
+        }));
+      }
+    },
+    setSubmitting: (t) => n({ isSubmitting: t }),
+    runSubmitValidation: async () => {
+      n({ isSubmitting: !0 });
+      const t = a(), r = await $e(e, t.values, l, i), s = Object.keys(r).length > 0;
+      return n({
+        errors: r,
+        isSubmitting: !1
+      }), {
+        state: a(),
+        hasError: s
+      };
+    }
+  }));
+}
+function w(...e) {
+  return le(ae(e));
+}
+const Ce = ["type", "value"], Q = /* @__PURE__ */ p({
   __name: "Input",
   props: {
     class: {},
@@ -15,74 +197,81 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     modelValue: {}
   },
   emits: ["update:modelValue", "blur"],
-  setup(e, { emit: o }) {
-    const a = e, d = o;
-    return (l, t) => (n(), m("input", {
+  setup(e, { emit: l }) {
+    const i = e, n = l;
+    return (a, t) => (d(), g("input", $(a.$attrs, {
       type: e.type,
-      class: S(s(y)("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", a.class)),
+      class: o(w)("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", i.class),
       value: e.modelValue,
-      onInput: t[0] || (t[0] = (u) => d("update:modelValue", u.target.value)),
-      onBlur: t[1] || (t[1] = (u) => d("blur", u))
-    }, null, 42, ce));
+      onInput: t[0] || (t[0] = (r) => n("update:modelValue", r.target.value)),
+      onBlur: t[1] || (t[1] = (r) => n("blur", r))
+    }), null, 16, Ce));
   }
-}), k = /* @__PURE__ */ f({
+}), P = /* @__PURE__ */ p({
   __name: "InputRenderer",
   props: {
     field: {},
+    fieldId: {},
     modelValue: {},
-    fieldId: {}
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
   },
-  emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = e, d = o, l = (t) => {
-      d("update:modelValue", q(a.field, t));
+  emits: ["update:modelValue", "blur"],
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = (t) => {
+      n("update:modelValue", H(i.field, t));
     };
-    return (t, u) => (n(), p(me, {
+    return (t, r) => (d(), y(Q, {
       id: e.fieldId,
       type: e.field.type,
       placeholder: e.field.placeholder,
-      disabled: e.field.disabled,
+      disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
       modelValue: e.modelValue ?? "",
-      "onUpdate:modelValue": l
+      "onUpdate:modelValue": a,
+      onBlur: r[0] || (r[0] = (s) => n("blur", s))
     }, null, 8, ["id", "type", "placeholder", "disabled", "name", "modelValue"]));
   }
-}), fe = ["value"], pe = /* @__PURE__ */ f({
+}), qe = ["value"], Pe = /* @__PURE__ */ p({
   __name: "Textarea",
   props: {
     class: {},
     modelValue: {}
   },
   emits: ["update:modelValue", "blur"],
-  setup(e, { emit: o }) {
-    const a = e, d = o;
-    return (l, t) => (n(), m("textarea", {
-      class: S(s(y)("flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", a.class)),
+  setup(e, { emit: l }) {
+    const i = e, n = l;
+    return (a, t) => (d(), g("textarea", $(a.$attrs, {
+      class: o(w)("flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", i.class),
       value: e.modelValue,
-      onInput: t[0] || (t[0] = (u) => d("update:modelValue", u.target.value)),
-      onBlur: t[1] || (t[1] = (u) => d("blur", u))
-    }, null, 42, fe));
+      onInput: t[0] || (t[0] = (r) => n("update:modelValue", r.target.value)),
+      onBlur: t[1] || (t[1] = (r) => n("blur", r))
+    }), null, 16, qe));
   }
-}), be = /* @__PURE__ */ f({
+}), De = /* @__PURE__ */ p({
   __name: "TextareaRenderer",
   props: {
     field: {},
+    fieldId: {},
     modelValue: {},
-    fieldId: {}
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
   },
   emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = o;
-    return (d, l) => (n(), p(pe, {
+  setup(e, { emit: l }) {
+    const i = l;
+    return (n, a) => (d(), y(Pe, {
       id: e.fieldId,
       placeholder: e.field.placeholder,
-      disabled: e.field.disabled,
+      disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
       modelValue: e.modelValue ?? "",
-      "onUpdate:modelValue": l[0] || (l[0] = (t) => a("update:modelValue", t))
+      "onUpdate:modelValue": a[0] || (a[0] = (t) => i("update:modelValue", t))
     }, null, 8, ["id", "placeholder", "disabled", "name", "modelValue"]));
   }
-}), ge = /* @__PURE__ */ f({
+}), Ne = /* @__PURE__ */ p({
   __name: "SelectTrigger",
   props: {
     disabled: { type: Boolean },
@@ -91,18 +280,18 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   setup(e) {
-    const o = e, a = h(() => {
-      const { class: l, ...t } = o;
+    const l = e, i = h(() => {
+      const { class: a, ...t } = l;
       return t;
-    }), d = _(a);
-    return (l, t) => (n(), p(s(H), V(s(d), {
-      class: s(y)("flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", o.class)
+    }), n = j(i);
+    return (a, t) => (d(), y(o(ie), $(o(n), {
+      class: o(w)("flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", l.class)
     }), {
-      default: r(() => [
-        w(l.$slots, "default"),
-        c(s(J), { "as-child": "" }, {
-          default: r(() => [
-            c(s(re), { class: "h-4 w-4 opacity-50" })
+      default: m(() => [
+        q(a.$slots, "default"),
+        b(o(ne), { "as-child": "" }, {
+          default: m(() => [
+            b(o(ke), { class: "h-4 w-4 opacity-50" })
           ]),
           _: 1
         })
@@ -110,7 +299,7 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 3
     }, 16, ["class"]));
   }
-}), he = /* @__PURE__ */ f({
+}), Ee = /* @__PURE__ */ p({
   __name: "SelectContent",
   props: {
     forceMount: { type: Boolean },
@@ -133,21 +322,21 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   setup(e) {
-    const o = e, a = h(() => {
-      const { class: l, ...t } = o;
+    const l = e, i = h(() => {
+      const { class: a, ...t } = l;
       return t;
-    }), d = _(a);
-    return (l, t) => (n(), p(s(K), null, {
-      default: r(() => [
-        c(s(Q), V(s(d), {
-          class: s(y)("relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2", e.position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", o.class)
+    }), n = j(i);
+    return (a, t) => (d(), y(o(se), null, {
+      default: m(() => [
+        b(o(re), $(o(n), {
+          class: o(w)("relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2", e.position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", l.class)
         }), {
-          default: r(() => [
-            c(s(X), {
-              class: S(s(y)("p-1", e.position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"))
+          default: m(() => [
+            b(o(oe), {
+              class: D(o(w)("p-1", e.position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"))
             }, {
-              default: r(() => [
-                w(l.$slots, "default")
+              default: m(() => [
+                q(a.$slots, "default")
               ]),
               _: 3
             }, 8, ["class"])
@@ -158,7 +347,7 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 3
     }));
   }
-}), ye = { class: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, ve = /* @__PURE__ */ f({
+}), Ue = { class: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, je = /* @__PURE__ */ p({
   __name: "SelectItem",
   props: {
     value: {},
@@ -169,28 +358,28 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   setup(e) {
-    const o = e, a = h(() => {
-      const { class: l, ...t } = o;
+    const l = e, i = h(() => {
+      const { class: a, ...t } = l;
       return t;
-    }), d = _(a);
-    return (l, t) => (n(), p(s(Y), V(s(d), {
-      class: s(y)(
+    }), n = j(i);
+    return (a, t) => (d(), y(o(de), $(o(n), {
+      class: o(w)(
         "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        o.class
+        l.class
       )
     }), {
-      default: r(() => [
-        I("span", ye, [
-          c(s(Z), null, {
-            default: r(() => [
-              c(s(U), { class: "h-4 w-4" })
+      default: m(() => [
+        O("span", Ue, [
+          b(o(ue), null, {
+            default: m(() => [
+              b(o(W), { class: "h-4 w-4" })
             ]),
             _: 1
           })
         ]),
-        c(s(ee), null, {
-          default: r(() => [
-            w(l.$slots, "default")
+        b(o(ce), null, {
+          default: m(() => [
+            q(a.$slots, "default")
           ]),
           _: 3
         })
@@ -198,7 +387,7 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 3
     }, 16, ["class"]));
   }
-}), xe = /* @__PURE__ */ f({
+}), Ae = /* @__PURE__ */ p({
   __name: "Select",
   props: {
     open: { type: Boolean },
@@ -212,48 +401,51 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     required: { type: Boolean }
   },
   emits: ["update:modelValue", "update:open"],
-  setup(e, { emit: o }) {
-    const l = P(e, o);
-    return (t, u) => (n(), p(s(te), z(N(s(l))), {
-      default: r(() => [
-        w(t.$slots, "default")
+  setup(e, { emit: l }) {
+    const a = A(e, l);
+    return (t, r) => (d(), y(o(me), X(Y(o(a))), {
+      default: m(() => [
+        q(t.$slots, "default")
       ]),
       _: 3
     }, 16));
   }
-}), Ve = /* @__PURE__ */ f({
+}), Me = /* @__PURE__ */ p({
   __name: "SelectRenderer",
   props: {
     field: {},
+    fieldId: {},
     modelValue: {},
-    fieldId: {}
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
   },
   emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = o;
-    return (d, l) => (n(), p(xe, {
-      disabled: e.field.disabled,
+  setup(e, { emit: l }) {
+    const i = l;
+    return (n, a) => (d(), y(Ae, {
+      disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
       modelValue: e.modelValue != null ? String(e.modelValue) : "",
-      "onUpdate:modelValue": l[0] || (l[0] = (t) => a("update:modelValue", t))
+      "onUpdate:modelValue": a[0] || (a[0] = (t) => i("update:modelValue", t))
     }, {
-      default: r(() => [
-        c(ge, { id: e.fieldId }, {
-          default: r(() => [
-            c(s(le), {
+      default: m(() => [
+        b(Ne, { id: e.fieldId }, {
+          default: m(() => [
+            b(o(fe), {
               placeholder: e.field.placeholder || "Select an option"
             }, null, 8, ["placeholder"])
           ]),
           _: 1
         }, 8, ["id"]),
-        c(he, null, {
-          default: r(() => [
-            (n(!0), m($, null, B(e.field.options, (t) => (n(), p(ve, {
+        b(Ee, null, {
+          default: m(() => [
+            (d(!0), g(N, null, E(e.field.options, (t) => (d(), y(je, {
               key: t.value,
               value: String(t.value)
             }, {
-              default: r(() => [
-                C(v(t.label), 1)
+              default: m(() => [
+                U(I(t.label), 1)
               ]),
               _: 2
             }, 1032, ["value"]))), 128))
@@ -264,7 +456,7 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 1
     }, 8, ["disabled", "name", "modelValue"]));
   }
-}), ke = /* @__PURE__ */ f({
+}), Oe = /* @__PURE__ */ p({
   __name: "Checkbox",
   props: {
     defaultChecked: { type: Boolean },
@@ -279,19 +471,19 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   emits: ["update:checked", "blur"],
-  setup(e, { emit: o }) {
-    const a = e, d = o, l = h(() => {
-      const { class: u, ...i } = a;
-      return i;
-    }), t = P(l, d);
-    return (u, i) => (n(), p(s(ae), V(s(t), {
-      class: s(y)("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", a.class),
-      onBlur: i[0] || (i[0] = (b) => d("blur"))
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = h(() => {
+      const { class: r, ...s } = i;
+      return s;
+    }), t = A(a, n);
+    return (r, s) => (d(), y(o(be), $(o(t), {
+      class: o(w)("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", i.class),
+      onBlur: s[0] || (s[0] = (u) => n("blur"))
     }), {
-      default: r(() => [
-        c(s(oe), { class: "flex h-full w-full items-center justify-center text-current" }, {
-          default: r(() => [
-            c(s(U), { class: "h-4 w-4" })
+      default: m(() => [
+        b(o(pe), { class: "flex h-full w-full items-center justify-center text-current" }, {
+          default: m(() => [
+            b(o(W), { class: "h-4 w-4" })
           ]),
           _: 1
         })
@@ -299,7 +491,7 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 1
     }, 16, ["class"]));
   }
-}), R = /* @__PURE__ */ f({
+}), T = /* @__PURE__ */ p({
   __name: "Label",
   props: {
     for: {},
@@ -308,62 +500,65 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   setup(e) {
-    const o = e, a = h(() => {
-      const { class: d, ...l } = o;
-      return l;
+    const l = e, i = h(() => {
+      const { class: n, ...a } = l;
+      return a;
     });
-    return (d, l) => (n(), p(s(se), V(a.value, {
-      class: s(y)("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", o.class)
+    return (n, a) => (d(), y(o(ge), $(i.value, {
+      class: o(w)("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", l.class)
     }), {
-      default: r(() => [
-        w(d.$slots, "default")
+      default: m(() => [
+        q(n.$slots, "default")
       ]),
       _: 3
     }, 16, ["class"]));
   }
-}), we = { class: "flex flex-wrap gap-4" }, $e = /* @__PURE__ */ f({
+}), ze = { class: "flex flex-wrap gap-4" }, Te = /* @__PURE__ */ p({
   __name: "CheckboxRenderer",
   props: {
     field: {},
+    fieldId: {},
     modelValue: {},
-    fieldId: {}
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
   },
   emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = e, d = o, l = (t, u) => {
-      const i = Array.isArray(a.modelValue) ? [...a.modelValue] : [];
-      if (u)
-        i.push(t);
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = (t, r) => {
+      const s = Array.isArray(i.modelValue) ? [...i.modelValue] : [];
+      if (r)
+        s.push(t);
       else {
-        const b = i.indexOf(t);
-        b > -1 && i.splice(b, 1);
+        const u = s.indexOf(t);
+        u > -1 && s.splice(u, 1);
       }
-      d("update:modelValue", i);
+      n("update:modelValue", s);
     };
-    return (t, u) => (n(), m("div", we, [
-      (n(!0), m($, null, B(e.field.options, (i) => (n(), m("div", {
-        key: i.value,
+    return (t, r) => (d(), g("div", ze, [
+      (d(!0), g(N, null, E(e.field.options, (s) => (d(), g("div", {
+        key: s.value,
         class: "flex items-center space-x-2"
       }, [
-        c(ke, {
-          id: `checkbox-${e.field.name}-${i.value}`,
-          disabled: e.field.disabled,
-          checked: Array.isArray(e.modelValue) && e.modelValue.includes(i.value),
-          "onUpdate:checked": (b) => l(i.value, !!b)
+        b(Oe, {
+          id: `checkbox-${e.field.name}-${s.value}`,
+          disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
+          checked: Array.isArray(e.modelValue) && e.modelValue.includes(s.value),
+          "onUpdate:checked": (u) => a(s.value, !!u)
         }, null, 8, ["id", "disabled", "checked", "onUpdate:checked"]),
-        c(R, {
-          for: `checkbox-${e.field.name}-${i.value}`,
+        b(T, {
+          for: `checkbox-${e.field.name}-${s.value}`,
           class: "font-normal"
         }, {
-          default: r(() => [
-            C(v(i.label), 1)
+          default: m(() => [
+            U(I(s.label), 1)
           ]),
           _: 2
         }, 1032, ["for"])
       ]))), 128))
     ]));
   }
-}), Se = /* @__PURE__ */ f({
+}), Ge = /* @__PURE__ */ p({
   __name: "RadioGroupItem",
   props: {
     id: {},
@@ -376,17 +571,17 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   setup(e) {
-    const o = e, a = h(() => {
-      const { class: l, ...t } = o;
+    const l = e, i = h(() => {
+      const { class: a, ...t } = l;
       return t;
-    }), d = _(a);
-    return (l, t) => (n(), p(s(de), V(s(d), {
-      class: s(y)("aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", o.class)
+    }), n = j(i);
+    return (a, t) => (d(), y(o(ye), $(o(n), {
+      class: o(w)("aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", l.class)
     }), {
-      default: r(() => [
-        c(s(ne), { class: "flex items-center justify-center" }, {
-          default: r(() => [
-            c(s(ue), { class: "h-2.5 w-2.5 fill-current text-current" })
+      default: m(() => [
+        b(o(ve), { class: "flex items-center justify-center" }, {
+          default: m(() => [
+            b(o(we), { class: "h-2.5 w-2.5 fill-current text-current" })
           ]),
           _: 1
         })
@@ -394,7 +589,7 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 1
     }, 16, ["class"]));
   }
-}), Be = /* @__PURE__ */ f({
+}), Le = /* @__PURE__ */ p({
   __name: "RadioGroup",
   props: {
     modelValue: {},
@@ -410,52 +605,55 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     class: {}
   },
   emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = e, d = o, l = h(() => {
-      const { class: u, ...i } = a;
-      return i;
-    }), t = P(l, d);
-    return (u, i) => (n(), p(s(ie), V(s(t), {
-      class: s(y)("grid gap-2", a.class)
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = h(() => {
+      const { class: r, ...s } = i;
+      return s;
+    }), t = A(a, n);
+    return (r, s) => (d(), y(o(he), $(o(t), {
+      class: o(w)("grid gap-2", i.class)
     }), {
-      default: r(() => [
-        w(u.$slots, "default")
+      default: m(() => [
+        q(r.$slots, "default")
       ]),
       _: 3
     }, 16, ["class"]));
   }
-}), Ce = /* @__PURE__ */ f({
+}), Ke = /* @__PURE__ */ p({
   __name: "RadioRenderer",
   props: {
     field: {},
+    fieldId: {},
     modelValue: {},
-    fieldId: {}
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
   },
   emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = o;
-    return (d, l) => (n(), p(Be, {
+  setup(e, { emit: l }) {
+    const i = l;
+    return (n, a) => (d(), y(Le, {
       class: "flex flex-wrap gap-4",
-      disabled: e.field.disabled,
+      disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
       modelValue: e.modelValue != null ? String(e.modelValue) : "",
-      "onUpdate:modelValue": l[0] || (l[0] = (t) => a("update:modelValue", t))
+      "onUpdate:modelValue": a[0] || (a[0] = (t) => i("update:modelValue", t))
     }, {
-      default: r(() => [
-        (n(!0), m($, null, B(e.field.options, (t) => (n(), m("div", {
+      default: m(() => [
+        (d(!0), g(N, null, E(e.field.options, (t) => (d(), g("div", {
           key: t.value,
           class: "flex items-center space-x-2"
         }, [
-          c(Se, {
+          b(Ge, {
             id: `radio-${e.field.name}-${t.value}`,
             value: String(t.value)
           }, null, 8, ["id", "value"]),
-          c(R, {
+          b(T, {
             for: `radio-${e.field.name}-${t.value}`,
             class: "font-normal"
           }, {
-            default: r(() => [
-              C(v(t.label), 1)
+            default: m(() => [
+              U(I(t.label), 1)
             ]),
             _: 2
           }, 1032, ["for"])
@@ -464,23 +662,109 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
       _: 1
     }, 8, ["disabled", "name", "modelValue"]));
   }
-}), F = {
-  text: k,
-  number: k,
-  password: k,
-  email: k,
-  date: k,
-  textarea: be,
-  select: Ve,
-  checkbox: $e,
-  radio: Ce
-}, _e = {
-  key: 1,
-  class: "text-[0.8rem] text-muted-foreground"
-}, Ie = {
-  key: 2,
-  class: "text-[0.8rem] font-medium text-destructive"
-}, Pe = /* @__PURE__ */ f({
+}), We = /* @__PURE__ */ p({
+  __name: "DateRenderer",
+  props: {
+    field: {},
+    modelValue: {},
+    fieldId: {},
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
+  },
+  emits: ["update:modelValue", "blur"],
+  setup(e, { emit: l }) {
+    const i = l;
+    return (n, a) => (d(), y(Q, {
+      id: e.fieldId,
+      type: "date",
+      modelValue: e.modelValue,
+      placeholder: e.field.placeholder,
+      disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
+      name: e.field.name,
+      "aria-invalid": e.ariaInvalid,
+      "aria-required": e.ariaRequired,
+      "aria-describedby": e.ariaDescribedby,
+      "onUpdate:modelValue": a[0] || (a[0] = (t) => i("update:modelValue", t)),
+      onBlur: a[1] || (a[1] = (t) => i("blur", t))
+    }, null, 8, ["id", "modelValue", "placeholder", "disabled", "name", "aria-invalid", "aria-required", "aria-describedby"]));
+  }
+}), He = /* @__PURE__ */ p({
+  __name: "Switch",
+  props: {
+    defaultChecked: { type: Boolean },
+    checked: { type: Boolean },
+    disabled: { type: Boolean },
+    required: { type: Boolean },
+    name: {},
+    id: {},
+    value: {},
+    asChild: { type: Boolean },
+    as: {},
+    class: {}
+  },
+  emits: ["update:checked"],
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = h(() => {
+      const { class: r, ...s } = i;
+      return s;
+    }), t = A(a, n);
+    return (r, s) => (d(), y(o(xe), $(o(t), {
+      class: o(w)(
+        "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+        i.class
+      )
+    }), {
+      default: m(() => [
+        b(o(Ve), {
+          class: D(o(w)(
+            "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+          ))
+        }, null, 8, ["class"])
+      ]),
+      _: 1
+    }, 16, ["class"]));
+  }
+}), Je = { class: "flex items-center space-x-2" }, Qe = /* @__PURE__ */ p({
+  __name: "SwitchRenderer",
+  props: {
+    field: {},
+    modelValue: { type: Boolean },
+    fieldId: {},
+    ariaInvalid: { type: Boolean },
+    ariaRequired: { type: Boolean },
+    ariaDescribedby: {}
+  },
+  emits: ["update:modelValue", "blur"],
+  setup(e, { emit: l }) {
+    const i = l;
+    return (n, a) => (d(), g("div", Je, [
+      b(He, {
+        id: e.fieldId,
+        checked: e.modelValue,
+        disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
+        "aria-invalid": e.ariaInvalid,
+        "aria-required": e.ariaRequired,
+        "aria-describedby": e.ariaDescribedby,
+        "onUpdate:checked": a[0] || (a[0] = (t) => i("update:modelValue", t))
+      }, null, 8, ["id", "checked", "disabled", "aria-invalid", "aria-required", "aria-describedby"])
+    ]));
+  }
+}), K = {
+  text: P,
+  number: P,
+  password: P,
+  email: P,
+  textarea: De,
+  select: Me,
+  checkbox: Te,
+  radio: Ke,
+  date: We,
+  switch: Qe
+}, Xe = {
+  key: 0,
+  class: "text-destructive"
+}, Ye = ["id"], Ze = ["id"], _e = /* @__PURE__ */ p({
   __name: "FormFieldRenderer",
   props: {
     field: {},
@@ -488,89 +772,153 @@ const ce = ["type", "value"], me = /* @__PURE__ */ f({
     error: {},
     componentMap: {}
   },
-  emits: ["update:modelValue"],
-  setup(e, { emit: o }) {
-    const a = e, d = o, l = h(() => `field-${a.field.name}`), t = h(
-      () => a.componentMap ? { ...F, ...a.componentMap } : F
-    ), u = h(
-      () => t.value[a.field.type] ?? k
+  emits: ["update:modelValue", "blur"],
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = h(() => `field-${i.field.name}`), t = h(() => `${a.value}-description`), r = h(() => `${a.value}-error`), s = h(() => {
+      var f;
+      return (f = i.field.validations) == null ? void 0 : f.some((V) => V.type === "required");
+    }), u = h(() => {
+      const f = [];
+      return i.field.description && f.push(t.value), i.error && f.push(r.value), f.length > 0 ? f.join(" ") : void 0;
+    }), c = h(
+      () => i.componentMap ? { ...K, ...i.componentMap } : K
+    ), x = h(
+      () => c.value[i.field.type] ?? P
     );
-    return (i, b) => (n(), m("div", {
-      class: S(["space-y-2", e.field.className])
+    return (f, V) => (d(), g("div", {
+      class: D(["space-y-2", e.field.className])
     }, [
-      e.field.label ? (n(), p(R, {
+      e.field.label ? (d(), y(T, {
         key: 0,
-        for: l.value
+        for: a.value,
+        class: D(s.value ? "flex items-center gap-1" : "")
       }, {
-        default: r(() => [
-          C(v(e.field.label), 1)
+        default: m(() => [
+          U(I(e.field.label) + " ", 1),
+          s.value ? (d(), g("span", Xe, "*")) : R("", !0)
         ]),
         _: 1
-      }, 8, ["for"])) : x("", !0),
-      (n(), p(T(u.value), {
+      }, 8, ["for", "class"])) : R("", !0),
+      (d(), y(Z(x.value), {
         field: e.field,
-        fieldId: l.value,
+        fieldId: a.value,
         modelValue: e.modelValue,
-        "onUpdate:modelValue": b[0] || (b[0] = (g) => d("update:modelValue", g))
-      }, null, 8, ["field", "fieldId", "modelValue"])),
-      e.field.description ? (n(), m("p", _e, v(e.field.description), 1)) : x("", !0),
-      e.error ? (n(), m("p", Ie, v(e.error), 1)) : x("", !0)
+        "aria-invalid": !!e.error,
+        "aria-required": s.value,
+        "aria-describedby": u.value,
+        "onUpdate:modelValue": V[0] || (V[0] = (F) => n("update:modelValue", F)),
+        onBlur: V[1] || (V[1] = (F) => n("blur", F))
+      }, null, 40, ["field", "fieldId", "modelValue", "aria-invalid", "aria-required", "aria-describedby"])),
+      e.field.description ? (d(), g("p", {
+        key: 1,
+        id: t.value,
+        class: "text-[0.8rem] text-muted-foreground"
+      }, I(e.field.description), 9, Ye)) : R("", !0),
+      e.error ? (d(), g("p", {
+        key: 2,
+        id: r.value,
+        class: "text-[0.8rem] font-medium text-destructive"
+      }, I(e.error), 9, Ze)) : R("", !0)
     ], 2));
   }
-}), Re = {
+});
+function et({ schema: e }) {
+  const l = Re(e.fields, e.resolver, e.errorMessages), i = _(l.getState()), n = l.subscribe((u) => {
+    i.value = u;
+  });
+  return ee(() => {
+    n();
+  }), {
+    store: l,
+    state: i,
+    // This is a Ref
+    setValue: async (u, c) => {
+      await l.getState().setFieldValue(u, c);
+    },
+    getValue: (u) => M(i.value.values, u),
+    validate: async () => {
+      const { hasError: u, state: c } = await l.getState().runSubmitValidation();
+      return { hasError: u, values: c.values };
+    },
+    reset: () => {
+      l.setState({
+        values: {},
+        errors: {},
+        isSubmitting: !1
+      });
+    }
+  };
+}
+const tt = {
   key: 0,
   class: "space-y-1"
-}, Fe = {
+}, at = {
   key: 0,
   class: "text-2xl font-bold tracking-tight"
-}, Ue = {
+}, lt = {
   key: 1,
   class: "text-muted-foreground"
-}, Me = { class: "space-y-4" }, ze = ["disabled"], Ae = /* @__PURE__ */ f({
+}, it = { class: "space-y-4" }, nt = ["disabled"], ct = /* @__PURE__ */ p({
   __name: "DynamicForm",
   props: {
     schema: {},
-    className: {}
+    className: {},
+    form: {}
   },
   emits: ["submit"],
-  setup(e, { emit: o }) {
-    const a = e, d = o, l = D(G(a.schema.fields)), t = (i, b) => {
-      l.value = A(a.schema.fields, l.value, i, b);
-    }, u = () => {
-      const i = E(l.value, !0), { state: b, hasError: g } = L(a.schema.fields, i);
-      l.value = b, g || d("submit", { ...b.values });
-    };
-    return (i, b) => (n(), m("form", {
-      class: S(["space-y-6", e.className]),
-      onSubmit: j(u, ["prevent"])
+  setup(e, { emit: l }) {
+    const i = e, n = l, a = et({ schema: i.schema }), t = i.form || a, { store: r, state: s } = t, u = async (v, C) => {
+      await r.getState().setFieldValue(v, C);
+    }, c = async (v) => {
+      await r.getState().setFieldBlur(v);
+    }, x = (v) => typeof v.hidden == "function" ? v.hidden(s.value.values) : !!v.hidden, f = (v) => {
+      const C = typeof v.disabled == "function" ? v.disabled(s.value.values) : !!v.disabled, k = s.value.validatingFields.includes(v.name);
+      return { ...v, disabled: C || k };
+    }, V = async () => {
+      const { hasError: v, values: C } = await t.validate();
+      if (v) {
+        const k = i.schema.fields.find((B) => s.value.errors[B.name]);
+        if (k) {
+          const B = document.getElementById(`field-${k.name}`);
+          B == null || B.focus(), B == null || B.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        return;
+      }
+      n("submit", C);
+    }, F = h(() => s.value.validatingFields.length > 0);
+    return (v, C) => (d(), g("form", {
+      class: D(["space-y-6", e.className]),
+      onSubmit: te(V, ["prevent"])
     }, [
-      e.schema.title || e.schema.description ? (n(), m("div", Re, [
-        e.schema.title ? (n(), m("h2", Fe, v(e.schema.title), 1)) : x("", !0),
-        e.schema.description ? (n(), m("p", Ue, v(e.schema.description), 1)) : x("", !0)
-      ])) : x("", !0),
-      I("div", Me, [
-        (n(!0), m($, null, B(e.schema.fields, (g) => (n(), m($, {
-          key: g.id
+      e.schema.title || e.schema.description ? (d(), g("div", tt, [
+        e.schema.title ? (d(), g("h2", at, I(e.schema.title), 1)) : R("", !0),
+        e.schema.description ? (d(), g("p", lt, I(e.schema.description), 1)) : R("", !0)
+      ])) : R("", !0),
+      O("div", it, [
+        (d(!0), g(N, null, E(e.schema.fields, (k) => (d(), g(N, {
+          key: k.id
         }, [
-          g.hidden ? x("", !0) : (n(), p(Pe, {
+          x(k) ? R("", !0) : (d(), y(_e, {
             key: 0,
-            field: g,
-            "model-value": l.value.values[g.name],
-            error: l.value.errors[g.name],
-            "onUpdate:modelValue": (M) => t(g.name, M)
-          }, null, 8, ["field", "model-value", "error", "onUpdate:modelValue"]))
+            field: f(k),
+            "model-value": o(M)(o(s).values, k.name),
+            error: o(s).errors[k.name],
+            "onUpdate:modelValue": (B) => u(k.name, B),
+            onBlur: (B) => c(k.name)
+          }, null, 8, ["field", "model-value", "error", "onUpdate:modelValue", "onBlur"]))
         ], 64))), 128))
       ]),
-      I("button", {
+      O("button", {
         type: "submit",
-        disabled: l.value.isSubmitting,
+        disabled: o(s).isSubmitting || F.value,
         class: "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
-      }, v(l.value.isSubmitting ? "Submitting..." : e.schema.submitButtonText || "Submit"), 9, ze)
+      }, I(o(s).isSubmitting ? "Submitting..." : F.value ? "Validating..." : e.schema.submitButtonText || "Submit"), 9, nt)
     ], 34));
   }
 });
 export {
-  Ae as DynamicForm,
-  Pe as FormFieldRenderer,
-  F as defaultComponentMap
+  ct as DynamicForm,
+  _e as FormFieldRenderer,
+  K as defaultComponentMap,
+  et as useForm
 };

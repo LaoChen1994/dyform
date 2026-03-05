@@ -1,17 +1,21 @@
-import { FormField } from './types.js';
+import * as zustand_vanilla from 'zustand/vanilla';
+import { FormField, FormResolver, ErrorMessageTemplates } from './types.js';
 
 interface FormRuntimeState {
     values: Record<string, any>;
     errors: Record<string, string>;
+    validatingFields: string[];
     isSubmitting: boolean;
 }
-declare function createFormRuntimeState(fields: FormField[]): FormRuntimeState;
-declare function setSubmitting(state: FormRuntimeState, isSubmitting: boolean): FormRuntimeState;
-declare function applyFieldChange(fields: FormField[], state: FormRuntimeState, name: string, rawValue: unknown): FormRuntimeState;
-declare function applyFieldBlur(fields: FormField[], state: FormRuntimeState, name: string): FormRuntimeState;
-declare function runSubmitValidation(fields: FormField[], state: FormRuntimeState): {
-    state: FormRuntimeState;
-    hasError: boolean;
-};
+interface FormStore extends FormRuntimeState {
+    setFieldValue: (name: string, rawValue: unknown) => Promise<void>;
+    setFieldBlur: (name: string) => Promise<void>;
+    setSubmitting: (isSubmitting: boolean) => void;
+    runSubmitValidation: () => Promise<{
+        state: FormRuntimeState;
+        hasError: boolean;
+    }>;
+}
+declare function createFormStore(fields: FormField[], resolver?: FormResolver, errorMessages?: ErrorMessageTemplates): zustand_vanilla.StoreApi<FormStore>;
 
-export { type FormRuntimeState, applyFieldBlur, applyFieldChange, createFormRuntimeState, runSubmitValidation, setSubmitting };
+export { type FormRuntimeState, type FormStore, createFormStore };

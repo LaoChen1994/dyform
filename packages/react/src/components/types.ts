@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { FormField } from 'pdyform/core';
+import type { FormField } from 'pdyform-core';
 
 /** All props passed into each individual field renderer component */
 export interface FieldRenderContext {
@@ -8,6 +8,11 @@ export interface FieldRenderContext {
   onChange: (value: any) => void;
   onBlur?: () => void;
   fieldId: string;
+  errorId?: string;
+  descriptionId?: string;
+  ariaInvalid?: boolean;
+  ariaRequired?: boolean;
+  ariaDescribedBy?: string;
 }
 
 /** A React component that renders a specific field type */

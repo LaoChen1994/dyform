@@ -1,68 +1,84 @@
-import type { FormSchema } from 'pdyform/core';
+import type { FormSchema } from 'pdyform-core/src/types';
 
 export const defaultSchema: FormSchema = {
-  title: 'Developer Debug Form',
-  description: 'Use this schema to quickly validate core logic and renderer behavior.',
-  submitButtonText: 'Submit Form',
+  title: 'Comprehensive Registration Form',
+  description: 'This form demonstrates conditional logic, nested data, and async validation.',
+  submitButtonText: 'Register Now',
   fields: [
     {
-      id: 'name',
-      name: 'name',
-      label: 'Name',
+      id: 'username',
+      name: 'username',
+      label: 'Username',
       type: 'text',
-      placeholder: 'Enter your name',
-      validations: [{ type: 'required', message: 'Name is required' }],
-    },
-    {
-      id: 'email',
-      name: 'email',
-      label: 'Email',
-      type: 'email',
-      placeholder: 'name@example.com',
+      placeholder: 'Check availability (try "admin")',
       validations: [
-        { type: 'required', message: 'Email is required' },
-        { type: 'email', message: 'Invalid email format' },
+        { type: 'required', message: 'Username is required' },
+        {
+          type: 'custom',
+          validator: async (val: string) => {
+            if (!val) return true;
+            await new Promise((r) => setTimeout(r, 800)); // Simulate API call
+            return val === 'admin' ? 'This username is already taken' : true;
+          },
+        },
       ],
-    },
-    {
-      id: 'age',
-      name: 'age',
-      label: 'Age',
-      type: 'number',
-      placeholder: '18',
-      validations: [{ type: 'min', value: 18, message: 'Age must be at least 18' }],
     },
     {
       id: 'role',
       name: 'role',
-      label: 'Role',
-      type: 'select',
+      label: 'Primary Role',
+      type: 'radio',
+      defaultValue: 'developer',
       options: [
         { label: 'Developer', value: 'developer' },
         { label: 'Designer', value: 'designer' },
-        { label: 'Product Manager', value: 'pm' },
+        { label: 'Other', value: 'other' },
       ],
-      validations: [{ type: 'required', message: 'Please choose a role' }],
     },
     {
-      id: 'skills',
-      name: 'skills',
-      label: 'Skills',
-      type: 'checkbox',
-      options: [
-        { label: 'TypeScript', value: 'ts' },
-        { label: 'React', value: 'react' },
-        { label: 'Vue', value: 'vue' },
-      ],
-      validations: [{ type: 'required', message: 'Pick at least one skill' }],
+      id: 'otherRole',
+      name: 'otherRole',
+      label: 'Please specify your role',
+      type: 'text',
+      hidden: (values) => values.role !== 'other',
+      validations: [{ type: 'required', message: 'Please specify your role' }],
+    },
+    {
+      id: 'address_city',
+      name: 'address.city',
+      label: 'City (Nested Path)',
+      type: 'text',
+      placeholder: 'e.g. San Francisco',
+    },
+    {
+      id: 'address_street',
+      name: 'address.street',
+      label: 'Street',
+      type: 'text',
+      placeholder: '123 Main St',
+      hidden: (values) => !values.address?.city,
+    },
+    {
+      id: 'isFullTime',
+      name: 'isFullTime',
+      label: 'Full-time Position',
+      type: 'switch',
+      defaultValue: true,
+    },
+    {
+      id: 'startDate',
+      name: 'startDate',
+      label: 'Expected Start Date',
+      type: 'date',
+      hidden: (values) => !values.isFullTime,
     },
     {
       id: 'bio',
       name: 'bio',
       label: 'Bio',
       type: 'textarea',
-      placeholder: 'Write something about yourself',
-      validations: [{ type: 'max', value: 120, message: 'Bio should be within 120 characters' }],
+      placeholder: 'Tell us about your experience',
+      validations: [{ type: 'max', value: 200, message: 'Max 200 characters' }],
     },
   ],
 };

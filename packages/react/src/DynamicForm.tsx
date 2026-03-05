@@ -1,41 +1,39 @@
-import React, { useState } from 'react';
-import {
-  FormSchema,
-  FormRuntimeState,
-  createFormRuntimeState,
-  applyFieldChange,
-  applyFieldBlur,
-  runSubmitValidation,
-  setSubmitting,
-} from 'pdyform/core';
+import React from 'react';
+import { FormSchema, get, FormField } from 'pdyform-core';
 import { FormFieldRenderer } from './FormFieldRenderer';
+import { useForm, UseFormReturn } from './useForm';
 
 interface DynamicFormProps {
   schema: FormSchema;
   onSubmit: (values: Record<string, any>) => void;
   className?: string;
+  form?: UseFormReturn;
 }
 
-export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, className }) => {
-  const [formState, setFormState] = useState<FormRuntimeState>(() => createFormRuntimeState(schema.fields));
+export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, className, form: externalForm }) => {
+  const internalForm = useForm({ schema });
+  const form = externalForm || internalForm;
+  const { state: formState, store } = form;
 
-  const handleFieldChange = (name: string, value: any) => {
-    setFormState((prev) => applyFieldChange(schema.fields, prev, name, value));
-  };
-
-  const handleFieldBlur = (name: string) => {
-    setFormState((prev) => applyFieldBlur(schema.fields, prev, name));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const submittingState = setSubmitting(formState, true);
-    const { state: validatedState, hasError } = runSubmitValidation(schema.fields, submittingState);
-    setFormState(validatedState);
-    if (!hasError) {
-      onSubmit(validatedState.values);
+    const { hasError, values, state } = await form.validate();
+    
+    if (hasError) {
+      // Find the first field in schema that has an error
+      const firstErrorField = schema.fields.find((f: FormField) => state.errors[f.name]);
+      if (firstErrorField) {
+        const element = document.getElementById(`field-${firstErrorField.name}`);
+        element?.focus();
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
     }
+    
+    onSubmit(values);
   };
+
+  const isAnyFieldValidating = formState.validatingFields.length > 0;
 
   return (
     <form onSubmit={handleSubmit} className={`space-y-6 ${className || ''}`}>
@@ -43,27 +41,34 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, clas
       {schema.description && <p className="text-muted-foreground">{schema.description}</p>}
       
       <div className="space-y-4">
-        {schema.fields.map((field) => (
-          !field.hidden && (
-            <FormFieldRenderer
-              key={field.name}
-              field={field}
-              value={formState.values[field.name]}
-              onChange={(val) => handleFieldChange(field.name, val)}
-              onBlur={() => handleFieldBlur(field.name)}
-              error={formState.errors[field.name]}
-            />
-          )
-        ))}
+        {schema.fields.map((field: FormField) => {
+          const isHidden = typeof field.hidden === 'function' ? field.hidden(formState.values) : field.hidden;
+          const isDisabled = typeof field.disabled === 'function' ? field.disabled(formState.values) : field.disabled;
+          const isValidating = formState.validatingFields.includes(field.name);
+
+          return (
+            !isHidden && (
+              <FormFieldRenderer
+                key={field.name}
+                field={{ ...field, disabled: isDisabled || isValidating }}
+                value={get(formState.values, field.name)}
+                onChange={(val) => store.getState().setFieldValue(field.name, val)}
+                onBlur={() => store.getState().setFieldBlur(field.name)}
+                error={formState.errors[field.name]}
+              />
+            )
+          );
+        })}
       </div>
 
       <button
         type="submit"
-        disabled={formState.isSubmitting}
+        disabled={formState.isSubmitting || isAnyFieldValidating}
         className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
       >
-        {formState.isSubmitting ? 'Submitting...' : (schema.submitButtonText || 'Submit')}
+        {formState.isSubmitting ? 'Submitting...' : (isAnyFieldValidating ? 'Validating...' : (schema.submitButtonText || 'Submit'))}
       </button>
     </form>
   );
 };
+
