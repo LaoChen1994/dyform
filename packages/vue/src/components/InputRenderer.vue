@@ -21,8 +21,8 @@ const handleInput = (nextValue: any) => {
     :placeholder="field.placeholder"
     :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
     :name="field.name"
-    :modelValue="modelValue ?? ''"
-    @update:modelValue="handleInput"
+    :model-value="modelValue ?? ''"
+    @update:model-value="handleInput"
     @blur="emit('blur', $event)"
   />
 </template>

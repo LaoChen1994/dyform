@@ -13,8 +13,8 @@ const emit = defineEmits<{ 'update:modelValue': [value: any] }>();
     class="flex flex-wrap gap-4"
     :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
     :name="field.name"
-    :modelValue="modelValue != null ? String(modelValue) : ''"
-    @update:modelValue="emit('update:modelValue', $event)"
+    :model-value="modelValue != null ? String(modelValue) : ''"
+    @update:model-value="emit('update:modelValue', $event)"
   >
     <div v-for="opt in field.options" :key="opt.value" class="flex items-center space-x-2">
       <RadioGroupItem :id="`radio-${field.name}-${opt.value}`" :value="String(opt.value)" />

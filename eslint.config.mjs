@@ -27,7 +27,13 @@ export default ts.config(
     rules: {
       ...reactPlugin.configs.flat.recommended.rules,
       "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react/no-unescaped-entities": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+      ],
     },
   },
   // Vue configuration
@@ -35,6 +41,9 @@ export default ts.config(
   {
     files: ["**/*.vue"],
     languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
       parserOptions: {
         parser: ts.parser,
         ecmaVersion: "latest",
@@ -44,6 +53,10 @@ export default ts.config(
     rules: {
       "vue/multi-word-component-names": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+      ],
     },
   },
   // Core configuration: Strict any

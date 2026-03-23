@@ -12,7 +12,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: any] }>();
     :placeholder="field.placeholder"
     :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
     :name="field.name"
-    :modelValue="modelValue ?? ''"
-    @update:modelValue="emit('update:modelValue', $event)"
+    :model-value="modelValue ?? ''"
+    @update:model-value="emit('update:modelValue', $event)"
   />
 </template>

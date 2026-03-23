@@ -18,14 +18,14 @@ const emit = defineEmits(['update:modelValue', 'blur']);
   <Input
     :id="fieldId"
     type="date"
-    :modelValue="modelValue"
+    :model-value="modelValue"
     :placeholder="field.placeholder"
     :disabled="typeof field.disabled === 'boolean' ? field.disabled : undefined"
     :name="field.name"
     :aria-invalid="ariaInvalid"
     :aria-required="ariaRequired"
     :aria-describedby="ariaDescribedby"
-    @update:modelValue="emit('update:modelValue', $event)"
+    @update:model-value="emit('update:modelValue', $event)"
     @blur="emit('blur', $event)"
   />
 </template>

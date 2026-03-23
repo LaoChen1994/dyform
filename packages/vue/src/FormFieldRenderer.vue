@@ -67,12 +67,12 @@ const ResolvedFieldComponent = computed<Component>(
     <component
       :is="ResolvedFieldComponent"
       :field="field"
-      :fieldId="fieldId"
-      :modelValue="modelValue"
+      :field-id="fieldId"
+      :model-value="modelValue"
       :aria-invalid="!!error"
       :aria-required="isRequired"
       :aria-describedby="ariaDescribedBy"
-      @update:modelValue="emit('update:modelValue', $event)"
+      @update:model-value="emit('update:modelValue', $event)"
       @blur="emit('blur', $event)"
     />
 
