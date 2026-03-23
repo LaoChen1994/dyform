@@ -15,7 +15,28 @@
     "packages/react/dist/**",
     "packages/vue/dist/**"
   ],
+  "main": "./packages/core/dist/index.cjs",
+  "module": "./packages/core/dist/index.js",
+  "types": "./packages/core/dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "core": [
+        "./packages/core/dist/index.d.ts"
+      ],
+      "react": [
+        "./packages/react/dist/index.d.ts"
+      ],
+      "vue": [
+        "./packages/vue/dist/index.d.ts"
+      ]
+    }
+  },
   "exports": {
+    ".": {
+      "types": "./packages/core/dist/index.d.ts",
+      "import": "./packages/core/dist/index.js",
+      "require": "./packages/core/dist/index.cjs"
+    },
     "./core": {
       "types": "./packages/core/dist/index.d.ts",
       "import": "./packages/core/dist/index.js",
@@ -37,11 +58,17 @@
     "dev:all": "turbo run dev",
     "dev:example": "turbo run dev --filter=@example/*",
     "test:all": "turbo run test",
+    "test:coverage:all": "turbo run test:coverage",
     "lint:all": "turbo run lint",
     "dev:example:react": "pnpm --filter @example/react-demo dev",
     "dev:example:vue": "pnpm --filter @example/vue-demo dev",
     "build:example:react": "pnpm --filter @example/react-demo build",
-    "build:example:vue": "pnpm --filter @example/vue-demo build"
+    "build:example:vue": "pnpm --filter @example/vue-demo build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish",
+    "size": "size-limit",
+    "prepare": "husky"
   },
   "license": "MIT",
   "homepage": "https://github.com/LaoChen1994/pdyform",
@@ -50,17 +77,24 @@
     "url": "https://github.com/LaoChen1994/pdyform"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@eslint/js": "^9.39.3",
+    "@size-limit/preset-small-lib": "^12.0.1",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
+    "@vitest/coverage-v8": "^1.6.1",
     "autoprefixer": "^10.4.27",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-vue": "^10.8.0",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
+    "size-limit": "^12.0.1",
     "tailwindcss": "^3.4.0",
     "turbo": "latest",
     "typescript": "^5.0.0",
@@ -69,5 +103,5 @@
     "vue": "^3.5.0"
   },
   "packageManager": "pnpm@9.0.0",
-  "version": "2.2.1"
+  "version": "2.3.0"
 }

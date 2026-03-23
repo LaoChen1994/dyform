@@ -22,7 +22,8 @@ export const defaultErrorMessages: Required<ErrorMessageTemplates> = {
 /**
  * Helper to replace placeholders like {label}, {value} in error messages
  */
-function formatMessage(template: string, field: FormField, rule: ValidationRule): string {
+function formatMessage(template: string | undefined, field: FormField, rule: ValidationRule): string {
+  if (!template) return '';
   return template
     .replace('{label}', field.label)
     .replace('{value}', String(rule.value || ''));
@@ -31,13 +32,13 @@ function formatMessage(template: string, field: FormField, rule: ValidationRule)
 /**
  * Simple get utility for nested objects
  */
-export function get(obj: any, path: string, defaultValue?: any): any {
+export function get(obj: Record<string, unknown> | null | undefined, path: string, defaultValue?: unknown): unknown {
   if (!path) return defaultValue;
   const keys = path.split(/[.[\]]/).filter(Boolean);
-  let result = obj;
+  let result: unknown = obj;
   for (const key of keys) {
     if (result === null || result === undefined) return defaultValue;
-    result = result[key];
+    result = (result as Record<string, unknown>)[key];
   }
   return result === undefined ? defaultValue : result;
 }
@@ -45,11 +46,11 @@ export function get(obj: any, path: string, defaultValue?: any): any {
 /**
  * Simple set utility for nested objects that returns a new object (immutable)
  */
-export function set(obj: any, path: string, value: any): any {
-  if (Object(obj) !== obj) return obj; // When obj is not an object
+export function set(obj: Record<string, unknown> | null | undefined, path: string, value: unknown): Record<string, unknown> {
+  if (Object(obj) !== obj) return obj as Record<string, unknown>; // When obj is not an object
   const keys = path.split(/[.[\]]/).filter(Boolean);
-  const newObj = { ...obj };
-  let current = newObj;
+  const newObj = { ...obj } as Record<string, unknown>;
+  let current: Record<string, unknown> = newObj;
 
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
@@ -59,9 +60,9 @@ export function set(obj: any, path: string, value: any): any {
     if (!(key in current) || current[key] === null || typeof current[key] !== 'object') {
       current[key] = isNextKeyIndex ? [] : {};
     } else {
-      current[key] = Array.isArray(current[key]) ? [...current[key]] : { ...current[key] };
+      current[key] = Array.isArray(current[key]) ? [...current[key]] : { ...(current[key] as Record<string, unknown>) };
     }
-    current = current[key];
+    current = current[key] as Record<string, unknown>;
   }
 
   current[keys[keys.length - 1]] = value;
@@ -78,7 +79,7 @@ export function normalizeFieldValue(field: FormField, value: unknown): unknown {
 }
 
 export async function validateField(
-  value: any,
+  value: unknown,
   field: FormField,
   customMessages?: ErrorMessageTemplates
 ): Promise<string | null> {
@@ -96,16 +97,16 @@ export async function validateField(
       case 'min':
         if (field.type === 'number') {
           const numericValue = parseNumberish(value);
-          if (numericValue !== null && numericValue < rule.value) {
+          if (numericValue !== null && numericValue < (rule.value as number)) {
             const template = field.type === 'number' ? messages.min : (typeof value === 'string' ? '{label} must be at least {value} characters' : messages.min);
             return rule.message || formatMessage(template, field, rule);
           }
           break;
         }
-        if (typeof value === 'number' && value < rule.value) {
+        if (typeof value === 'number' && value < (rule.value as number)) {
           return rule.message || formatMessage(messages.min, field, rule);
         }
-        if (typeof value === 'string' && value.length < rule.value) {
+        if (typeof value === 'string' && value.length < (rule.value as number)) {
           const template = '{label} must be at least {value} characters';
           return rule.message || formatMessage(template, field, rule);
         }
@@ -113,28 +114,28 @@ export async function validateField(
       case 'max':
         if (field.type === 'number') {
           const numericValue = parseNumberish(value);
-          if (numericValue !== null && numericValue > rule.value) {
+          if (numericValue !== null && numericValue > (rule.value as number)) {
             return rule.message || formatMessage(messages.max, field, rule);
           }
           break;
         }
-        if (typeof value === 'number' && value > rule.value) {
+        if (typeof value === 'number' && value > (rule.value as number)) {
           return rule.message || formatMessage(messages.max, field, rule);
         }
-        if (typeof value === 'string' && value.length > rule.value) {
+        if (typeof value === 'string' && value.length > (rule.value as number)) {
           const template = '{label} must be at most {value} characters';
           return rule.message || formatMessage(template, field, rule);
         }
         break;
       case 'email': {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (value && !emailRegex.test(value)) {
+        if (value && !emailRegex.test(value as string)) {
           return rule.message || formatMessage(messages.email, field, rule);
         }
         break;
       }
       case 'pattern':
-        if (value && rule.value && !new RegExp(rule.value).test(value)) {
+        if (value && rule.value && !new RegExp(rule.value as string).test(value as string)) {
           return rule.message || formatMessage(messages.pattern, field, rule);
         }
         break;
@@ -156,7 +157,7 @@ export async function validateFieldByName(
   name: string,
   value: unknown,
   resolver?: FormResolver,
-  allValues?: any,
+  allValues?: Record<string, unknown>,
   customMessages?: ErrorMessageTemplates
 ): Promise<string | null> {
   // 1. Run resolver if provided
@@ -173,7 +174,7 @@ export async function validateFieldByName(
 
 export async function validateForm(
   fields: FormField[],
-  values: Record<string, any>,
+  values: Record<string, unknown>,
   resolver?: FormResolver,
   customMessages?: ErrorMessageTemplates
 ): Promise<Record<string, string>> {
@@ -200,9 +201,9 @@ export async function validateForm(
   return errors;
 }
 
-export function getDefaultValues(fields: FormField[]): Record<string, any> {
+export function getDefaultValues(fields: FormField[]): Record<string, unknown> {
   return fields.reduce((acc, field) => {
     acc[field.name] = field.defaultValue !== undefined ? field.defaultValue : (field.type === 'checkbox' ? [] : '');
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, unknown>);
 }

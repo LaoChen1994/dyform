@@ -14,6 +14,7 @@ var defaultErrorMessages = {
   custom: "Invalid value"
 };
 function formatMessage(template, field, rule) {
+  if (!template) return "";
   return template.replace("{label}", field.label).replace("{value}", String(rule.value || ""));
 }
 function get(obj, path, defaultValue) {

@@ -1,16 +1,16 @@
 import { ref, onUnmounted, computed } from 'vue';
-import { createFormStore, get } from 'pdyform-core';
-import type { FormSchema, FormStore } from 'pdyform-core';
+import { createFormEngine, get } from 'pdyform-core';
+import type { FormSchema, FormRuntimeState } from 'pdyform-core';
 
 export interface UseFormOptions {
   schema: FormSchema;
 }
 
 export function useForm({ schema }: UseFormOptions) {
-  const store = createFormStore(schema.fields, schema.resolver, schema.errorMessages);
-  const formState = ref<FormStore>(store.getState());
+  const engine = createFormEngine(schema.fields, schema.resolver, schema.errorMessages);
+  const formState = ref<FormRuntimeState>(engine.store.getState());
 
-  const unsubscribe = store.subscribe((state) => {
+  const unsubscribe = engine.store.subscribe((state: FormRuntimeState) => {
     formState.value = state;
   });
 
@@ -19,7 +19,7 @@ export function useForm({ schema }: UseFormOptions) {
   });
 
   const setValue = async (name: string, value: any) => {
-    await store.getState().setFieldValue(name, value);
+    await engine.setFieldValue(name, value);
   };
 
   const getValue = (name: string) => {
@@ -27,12 +27,12 @@ export function useForm({ schema }: UseFormOptions) {
   };
 
   const validate = async () => {
-    const { hasError, state } = await store.getState().runSubmitValidation();
+    const { hasError, state } = await engine.runSubmitValidation();
     return { hasError, values: state.values };
   };
 
   const reset = () => {
-    store.setState({
+    engine.store.setState({
       values: {},
       errors: {},
       isSubmitting: false,
@@ -40,7 +40,7 @@ export function useForm({ schema }: UseFormOptions) {
   };
 
   return {
-    store,
+    engine,
     state: formState, // This is a Ref
     setValue,
     getValue,

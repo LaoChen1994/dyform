@@ -15,14 +15,14 @@ const emit = defineEmits(['submit']);
 
 const internalForm = useForm({ schema: props.schema });
 const form = props.form || internalForm;
-const { store, state: formState } = form;
+const { engine, state: formState } = form;
 
 const handleFieldChange = async (name: string, value: any) => {
-  await store.getState().setFieldValue(name, value);
+  await engine.setFieldValue(name, value);
 };
 
 const handleFieldBlur = async (name: string) => {
-  await store.getState().setFieldBlur(name);
+  await engine.setFieldBlur(name);
 };
 
 const isFieldHidden = (field: any) => {

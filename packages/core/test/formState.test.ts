@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createFormStore } from '../src/formState';
+import { createFormEngine } from '../src/formState';
 import { FormField } from '../src/types';
 
 describe('core formStore helpers', () => {
@@ -9,8 +9,8 @@ describe('core formStore helpers', () => {
   ];
 
   it('creates initial runtime state', () => {
-    const store = createFormStore(fields);
-    const state = store.getState();
+    const engine = createFormEngine(fields);
+    const state = engine.store.getState();
 
     expect(state.values).toEqual({ name: '', age: '' });
     expect(state.errors).toEqual({});
@@ -18,38 +18,38 @@ describe('core formStore helpers', () => {
   });
 
   it('sets submitting state', () => {
-    const store = createFormStore(fields);
-    store.getState().setSubmitting(true);
-    expect(store.getState().isSubmitting).toBe(true);
+    const engine = createFormEngine(fields);
+    engine.setSubmitting(true);
+    expect(engine.store.getState().isSubmitting).toBe(true);
   });
 
   it('applies field change with normalization and inline validation', async () => {
-    const store = createFormStore(fields);
-    await store.getState().setFieldValue('age', '22');
+    const engine = createFormEngine(fields);
+    await engine.setFieldValue('age', '22');
 
-    expect(store.getState().values.age).toBe(22);
-    expect(store.getState().errors.age).toBeUndefined();
+    expect(engine.store.getState().values.age).toBe(22);
+    expect(engine.store.getState().errors.age).toBeUndefined();
   });
 
   it('applies blur validation', async () => {
-    const store = createFormStore(fields);
-    await store.getState().setFieldBlur('name');
+    const engine = createFormEngine(fields);
+    await engine.setFieldBlur('name');
 
-    expect(store.getState().errors.name).toBe('Name is required');
+    expect(engine.store.getState().errors.name).toBe('Name is required');
   });
 
   it('runs submit validation and returns hasError flag', async () => {
-    const store = createFormStore(fields);
-    const result = await store.getState().runSubmitValidation();
+    const engine = createFormEngine(fields);
+    const result = await engine.runSubmitValidation();
 
     expect(result.hasError).toBe(true);
-    expect(store.getState().isSubmitting).toBe(false);
-    expect(store.getState().errors.name).toBe('Name is required');
+    expect(engine.store.getState().isSubmitting).toBe(false);
+    expect(engine.store.getState().errors.name).toBe('Name is required');
   });
 
   it('handles field normalization (number)', async () => {
-    const store = createFormStore(fields);
-    await store.getState().setFieldValue('age', '25');
-    expect(store.getState().values.age).toBe(25);
+    const engine = createFormEngine(fields);
+    await engine.setFieldValue('age', '25');
+    expect(engine.store.getState().values.age).toBe(25);
   });
 });

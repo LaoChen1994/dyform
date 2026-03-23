@@ -15,7 +15,7 @@ export const defaultSchema: FormSchema = {
         { type: 'required', message: 'Username is required' },
         {
           type: 'custom',
-          validator: async (val: string) => {
+          validator: async (val: any) => {
             if (!val) return true;
             await new Promise((r) => setTimeout(r, 800)); // Simulate API call
             return val === 'admin' ? 'This username is already taken' : true;
@@ -40,7 +40,7 @@ export const defaultSchema: FormSchema = {
       name: 'otherRole',
       label: 'Please specify your role',
       type: 'text',
-      hidden: (values) => values.role !== 'other',
+      hidden: (values: any) => values.role !== 'other',
       validations: [{ type: 'required', message: 'Please specify your role' }],
     },
     {
@@ -56,7 +56,7 @@ export const defaultSchema: FormSchema = {
       label: 'Street',
       type: 'text',
       placeholder: '123 Main St',
-      hidden: (values) => !values.address?.city,
+      hidden: (values: any) => !values.address?.city,
     },
     {
       id: 'isFullTime',
@@ -70,7 +70,7 @@ export const defaultSchema: FormSchema = {
       name: 'startDate',
       label: 'Expected Start Date',
       type: 'date',
-      hidden: (values) => !values.isFullTime,
+      hidden: (values: any) => !values.isFullTime,
     },
     {
       id: 'bio',

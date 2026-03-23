@@ -1,6 +1,6 @@
 import * as React from 'react';
 import React__default from 'react';
-import { createFormStore, FormStore, FormRuntimeState, FormSchema, FormField } from 'pdyform-core';
+import { FormEngine, FormRuntimeState, FormSchema, FormField } from 'pdyform-core';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import * as class_variance_authority_types from 'class-variance-authority/types';
 import * as LabelPrimitive from '@radix-ui/react-label';
@@ -13,8 +13,8 @@ interface UseFormOptions {
     schema: FormSchema;
 }
 interface UseFormReturn {
-    store: ReturnType<typeof createFormStore>;
-    state: FormStore;
+    engine: FormEngine;
+    state: FormRuntimeState;
     setValue: (name: string, value: any) => Promise<void>;
     getValue: (name: string) => any;
     setError: (name: string, error: string) => void;
@@ -24,6 +24,7 @@ interface UseFormReturn {
         state: FormRuntimeState;
     }>;
     reset: () => void;
+    useWatch: (name: string) => any;
 }
 declare function useForm({ schema }: UseFormOptions): UseFormReturn;
 

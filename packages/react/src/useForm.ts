@@ -1,59 +1,71 @@
-import { useMemo, useCallback } from 'react';
-import { useStore } from 'zustand';
-import { createFormStore, FormSchema, FormStore, get, FormRuntimeState } from 'pdyform-core';
+import { useMemo, useCallback, useSyncExternalStore } from 'react';
+import { createFormEngine, FormSchema, FormEngine, get, FormRuntimeState } from 'pdyform-core';
 
 export interface UseFormOptions {
   schema: FormSchema;
 }
 
 export interface UseFormReturn {
-  store: ReturnType<typeof createFormStore>;
-  state: FormStore;
+  engine: FormEngine;
+  state: FormRuntimeState;
   setValue: (name: string, value: any) => Promise<void>;
   getValue: (name: string) => any;
   setError: (name: string, error: string) => void;
   validate: () => Promise<{ hasError: boolean; values: any; state: FormRuntimeState }>;
   reset: () => void;
+  useWatch: (name: string) => any;
 }
 
 export function useForm({ schema }: UseFormOptions): UseFormReturn {
-  const store = useMemo(() => createFormStore(schema.fields, schema.resolver, schema.errorMessages), [schema]);
-  const state = useStore(store);
+  const engine = useMemo(() => createFormEngine(schema.fields, schema.resolver, schema.errorMessages), [schema]);
+  const state = useSyncExternalStore(
+    (listener) => engine.store.subscribe(listener),
+    engine.store.getState
+  );
+
+  // 细粒度订阅 Hook：仅当特定 name 的字段值变化时，所在的子组件才会重渲染
+  const useWatch = useCallback((name: string) => {
+    return useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => get(engine.store.getState().values, name)
+    );
+  }, [engine]);
 
   const setValue = useCallback(async (name: string, value: any) => {
-    await store.getState().setFieldValue(name, value);
-  }, [store]);
+    await engine.setFieldValue(name, value);
+  }, [engine]);
 
   const getValue = useCallback((name: string) => {
-    return get(store.getState().values, name);
-  }, [store]);
+    return get(engine.store.getState().values, name);
+  }, [engine]);
 
   const setError = useCallback((name: string, error: string) => {
-    store.setState((prev) => ({
+    engine.store.setState((prev: FormRuntimeState) => ({
       errors: { ...prev.errors, [name]: error },
     }));
-  }, [store]);
+  }, [engine]);
 
   const validate = useCallback(async () => {
-    const { hasError, state: validatedState } = await store.getState().runSubmitValidation();
+    const { hasError, state: validatedState } = await engine.runSubmitValidation();
     return { hasError, values: validatedState.values, state: validatedState };
-  }, [store]);
+  }, [engine]);
 
   const reset = useCallback(() => {
-    store.setState({
-      values: {}, // Need a proper reset in core, but let's do simple reset here first
+    engine.store.setState({
+      values: {}, 
       errors: {},
       isSubmitting: false,
     });
-  }, [store]);
+  }, [engine]);
 
   return {
-    store,
+    engine,
     state,
     setValue,
     getValue,
     setError,
     validate,
     reset,
+    useWatch,
   };
 }

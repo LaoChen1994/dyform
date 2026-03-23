@@ -1,6 +1,6 @@
 {
   "name": "pdyform-vue",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Vue components for pdyform.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,10 +16,12 @@
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.json --declaration --emitDeclarationOnly --outDir dist",
     "dev": "vite",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.{ts,vue} --no-error-on-unmatched-pattern"
   },
   "dependencies": {

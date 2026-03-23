@@ -46,6 +46,13 @@ export default ts.config(
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
+  // Core configuration: Strict any
+  {
+    files: ["packages/core/src/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
   prettierConfig,
   {
     ignores: ["**/dist/**", "**/node_modules/**"],

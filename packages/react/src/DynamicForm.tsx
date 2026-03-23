@@ -13,7 +13,7 @@ interface DynamicFormProps {
 export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, className, form: externalForm }) => {
   const internalForm = useForm({ schema });
   const form = externalForm || internalForm;
-  const { state: formState, store } = form;
+  const { state: formState, engine } = form;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,8 +62,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, clas
                 key={field.name}
                 field={{ ...field, disabled: isDisabled || isValidating }}
                 value={get(formState.values, field.name)}
-                onChange={(val) => store.getState().setFieldValue(field.name, val)}
-                onBlur={() => store.getState().setFieldBlur(field.name)}
+                onChange={(val) => engine.setFieldValue(field.name, val)}
+                onBlur={() => engine.setFieldBlur(field.name)}
                 error={formState.errors[field.name]}
               />
             )

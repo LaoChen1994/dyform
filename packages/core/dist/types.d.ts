@@ -1,9 +1,9 @@
 type FieldType = 'text' | 'number' | 'email' | 'password' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'date' | 'switch';
 interface ValidationRule {
     type: 'required' | 'min' | 'max' | 'pattern' | 'email' | 'custom';
-    value?: any;
+    value?: unknown;
     message?: string;
-    validator?: (value: any) => boolean | string | Promise<boolean | string>;
+    validator?: (value: unknown) => boolean | string | Promise<boolean | string>;
 }
 interface Option {
     label: string;
@@ -16,14 +16,14 @@ interface FormField {
     type: FieldType;
     placeholder?: string;
     description?: string;
-    defaultValue?: any;
+    defaultValue?: unknown;
     options?: Option[];
     validations?: ValidationRule[];
-    hidden?: boolean | ((values: any) => boolean);
-    disabled?: boolean | ((values: any) => boolean);
+    hidden?: boolean | ((values: Record<string, unknown>) => boolean);
+    disabled?: boolean | ((values: Record<string, unknown>) => boolean);
     className?: string;
 }
-type FormResolver = (values: any) => Record<string, string> | Promise<Record<string, string>>;
+type FormResolver = (values: Record<string, unknown>) => Record<string, string> | Promise<Record<string, string>>;
 type ErrorMessageTemplates = {
     required?: string;
     min?: string;
@@ -41,7 +41,7 @@ interface FormSchema {
     errorMessages?: ErrorMessageTemplates;
 }
 interface FormState {
-    values: Record<string, any>;
+    values: Record<string, unknown>;
     errors: Record<string, string>;
     validatingFields: string[];
     isSubmitting: boolean;

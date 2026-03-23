@@ -2,9 +2,9 @@ export type FieldType = 'text' | 'number' | 'email' | 'password' | 'select' | 'c
 
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'pattern' | 'email' | 'custom';
-  value?: any;
+  value?: unknown;
   message?: string;
-  validator?: (value: any) => boolean | string | Promise<boolean | string>;
+  validator?: (value: unknown) => boolean | string | Promise<boolean | string>;
 }
 
 export interface Option {
@@ -19,15 +19,15 @@ export interface FormField {
   type: FieldType;
   placeholder?: string;
   description?: string;
-  defaultValue?: any;
+  defaultValue?: unknown;
   options?: Option[]; // For select, radio, checkbox
   validations?: ValidationRule[];
-  hidden?: boolean | ((values: any) => boolean);
-  disabled?: boolean | ((values: any) => boolean);
+  hidden?: boolean | ((values: Record<string, unknown>) => boolean);
+  disabled?: boolean | ((values: Record<string, unknown>) => boolean);
   className?: string; // CSS class for custom styling
 }
 
-export type FormResolver = (values: any) => Record<string, string> | Promise<Record<string, string>>;
+export type FormResolver = (values: Record<string, unknown>) => Record<string, string> | Promise<Record<string, string>>;
 
 export type ErrorMessageTemplates = {
   required?: string;
@@ -48,7 +48,7 @@ export interface FormSchema {
 }
 
 export interface FormState {
-  values: Record<string, any>;
+  values: Record<string, unknown>;
   errors: Record<string, string>;
   validatingFields: string[];
   isSubmitting: boolean;

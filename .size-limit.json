@@ -1,0 +1,22 @@
+[
+  {
+    "name": "core (ESM)",
+    "path": "packages/core/dist/index.js",
+    "limit": "10 kB"
+  },
+  {
+    "name": "core (CJS)",
+    "path": "packages/core/dist/index.cjs",
+    "limit": "10 kB"
+  },
+  {
+    "name": "react (ESM)",
+    "path": "packages/react/dist/index.js",
+    "limit": "15 kB"
+  },
+  {
+    "name": "vue (ESM)",
+    "path": "packages/vue/dist/index.mjs",
+    "limit": "15 kB"
+  }
+]

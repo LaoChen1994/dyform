@@ -1,6 +1,6 @@
 {
   "name": "pdyform-react",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React components for pdyform.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,10 +16,12 @@
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.tsx --format cjs,esm --dts --clean --minify --external react --external react-dom --external pdyform-core",
     "dev": "tsup src/index.tsx --format cjs,esm --watch --dts --external react --external react-dom --external pdyform-core",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.{ts,tsx} --no-error-on-unmatched-pattern",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -34,8 +36,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.300.0",
     "pdyform-core": "workspace:*",
-    "tailwind-merge": "^2.6.1",
-    "zustand": "^5.0.11"
+    "tailwind-merge": "^2.6.1"
   },
   "peerDependencies": {
     "react": "^18.0.0",

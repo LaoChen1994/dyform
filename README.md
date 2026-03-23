@@ -1,7 +1,8 @@
 # pdyform
 
 [![npm version](https://badge.fury.io/js/pdyform.svg)](https://badge.fury.io/js/pdyform)
-[![Tests](https://img.shields.io/badge/tests-27%20passed%20(100%25)-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-pass-brightgreen.svg)]()
+[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [English](#english) | [中文说明](#中文说明)
@@ -16,10 +17,19 @@ A high-performance, schema-driven dynamic form system with **React** and **Vue**
 
 - **Schema-Driven**: Define your forms using a simple and intuitive JSON/JS schema.
 - **Framework Agnostic Core**: Core logic is entirely framework-free, making it extremely lightweight and portable.
+- **Vanilla Pub-Sub Store**: Built-in 40-line `VanillaStore` ensures high-performance updates without relying on heavy state-management libraries like Zustand or Redux.
 - **Conditional Logic**: Supports dynamic `hidden` and `disabled` states based on form values (supports both boolean and functions).
-- **React & Vue Support**: Out-of-the-box UI components built on top of modern UI libraries (Radix UI / Shadcn).
-- **Type Safety**: Built with TypeScript for excellent developer experience and catch errors early.
-- **High Performance**: Optimized rendering using store-based state management (Zustand) to minimize re-renders.
+- **React & Vue Support**: Out-of-the-box UI components. (Moving towards a pure Headless approach to decouple from Tailwind/Shadcn).
+- **Type Safety**: Built with strict TypeScript for excellent developer experience and early error catching.
+- **High Test Coverage**: Core logic is heavily tested (>85% coverage) ensuring robustness against edge cases like network-level async validation and race conditions.
+- **Zero Side Effects**: Configured for aggressive tree-shaking with `"sideEffects": false`.
+
+### 🏗 Architecture & Roadmap
+
+pdyform is built with a strict separation of concerns:
+1. **Core Data Engine (`pdyform-core`)**: Maintains the schema structure, parses definitions, runs asynchronous/synchronous validations, and manages state using an internal Vanilla Pub-Sub model.
+2. **Framework Adapters (`pdyform-react` / `pdyform-vue`)**: Wraps the core engine with localized hooks (e.g. `useSyncExternalStore` for React) and provides base components.
+3. **Headless Roadmap**: Currently, the React/Vue components bundle specific UI elements (Radix, Tailwind). We are moving towards a true Headless architecture where the packages expose only accessible logic components (`<Field>`) and hooks (`useForm`), leaving the styling implementation entirely up to the user (similar to unstyled Shadcn UI).
 
 ### 📦 Packages
 
@@ -116,10 +126,19 @@ const handleSubmit = (values: any) => console.log(values);
 
 - **Schema 驱动**: 使用简单直观的 JSON/JS 对象定义你的表单。
 - **框架无关核心**: 核心逻辑完全独立于 UI 框架，极其轻量且易于移植。
+- **原生的防抖状态引擎**: 内置不到 40 行的 `VanillaStore` 来完成高性能的局部渲染与订阅，告别由于集成 Zustand 等库带来的体积膨胀。
 - **联动逻辑**: 支持基于表单实时数值动态控制字段的 `hidden`（隐藏）和 `disabled`（禁用）状态（支持布尔值或函数）。
-- **支持 React & Vue**: 提供基于现代 UI 库（Radix UI / Shadcn）的开箱即用组件。
+- **支持 React & Vue**: 提供开箱即用的基础组件 (未来的路线图将向纯 Headless UI 组件过渡，解耦 Tailwind 样式依赖)。
 - **类型安全**: 全量 TypeScript 编写，提供极佳的开发体验。
-- **高性能**: 基于 Zustand 状态管理库优化渲染逻辑，最小化不必要的组件重绘。
+- **高测试覆盖**: 核心逻辑配备了超过 85% 的单元测试与异步并发校验的健壮性控制。
+- **零副作用**: 各包均通过 `"sideEffects": false` 配置，对构建工具进行深度 Tree-Shaking 优化。
+
+### 🏗 架构与路线图设计
+
+整个引擎保持了极其严格的职责划分：
+1. **核心数据引擎 (`pdyform-core`)**: 管理表单 Schema 结构的解析，处理异步和同步的各项校验机制。利用手写原生 Pub-Sub 处理多级数据变化拦截。
+2. **框架适配 Hook (`pdyform-react` / `pdyform-vue`)**: 将状态和渲染树绑定（如在 React 中使用 `useSyncExternalStore`）。
+3. **Headless 演进**: 尽全力提供类似无头表单 (Headless Form) 的钩子调用，不再强绑定各类 UI 组件库和样式设定。
 
 ### 📦 包结构
 

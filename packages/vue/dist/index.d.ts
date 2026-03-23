@@ -2,13 +2,12 @@ import { Component } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { DefineComponent } from 'vue';
+import { FormEngine } from 'pdyform-core';
 import { FormField } from 'pdyform-core';
 import { FormRuntimeState } from 'pdyform-core';
 import { FormSchema } from 'pdyform-core';
-import { FormStore } from 'pdyform-core';
 import { PublicProps } from 'vue';
 import { Ref } from 'vue';
-import { StoreApi } from 'zustand/vanilla';
 
 declare type __VLS_Props = {
     schema: FormSchema;
@@ -66,37 +65,23 @@ onBlur?: ((...args: any[]) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
 
 export declare function useForm({ schema }: UseFormOptions): {
-    store: StoreApi<FormStore>;
+    engine: FormEngine;
     state: Ref<    {
-    setFieldValue: (name: string, rawValue: unknown) => Promise<void>;
-    setFieldBlur: (name: string) => Promise<void>;
-    setSubmitting: (isSubmitting: boolean) => void;
-    runSubmitValidation: () => Promise<{
-    state: FormRuntimeState;
-    hasError: boolean;
-    }>;
-    values: Record<string, any>;
+    values: Record<string, unknown>;
     errors: Record<string, string>;
     validatingFields: string[];
     isSubmitting: boolean;
-    }, FormStore | {
-    setFieldValue: (name: string, rawValue: unknown) => Promise<void>;
-    setFieldBlur: (name: string) => Promise<void>;
-    setSubmitting: (isSubmitting: boolean) => void;
-    runSubmitValidation: () => Promise<{
-    state: FormRuntimeState;
-    hasError: boolean;
-    }>;
-    values: Record<string, any>;
+    }, FormRuntimeState | {
+    values: Record<string, unknown>;
     errors: Record<string, string>;
     validatingFields: string[];
     isSubmitting: boolean;
     }>;
     setValue: (name: string, value: any) => Promise<void>;
-    getValue: (name: string) => any;
+    getValue: (name: string) => unknown;
     validate: () => Promise<{
         hasError: boolean;
-        values: Record<string, any>;
+        values: Record<string, unknown>;
     }>;
     reset: () => void;
 };
