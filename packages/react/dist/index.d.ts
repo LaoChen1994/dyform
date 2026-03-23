@@ -36,12 +36,10 @@ interface DynamicFormProps {
 }
 declare const DynamicForm: React__default.FC<DynamicFormProps>;
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-}
+type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 declare const Input: React.ForwardRefExoticComponent<InputProps & React.RefAttributes<HTMLInputElement>>;
 
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-}
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 declare const Textarea: React.ForwardRefExoticComponent<TextareaProps & React.RefAttributes<HTMLTextAreaElement>>;
 
 declare const Checkbox: React.ForwardRefExoticComponent<Omit<CheckboxPrimitive.CheckboxProps & React.RefAttributes<HTMLButtonElement>, "ref"> & React.RefAttributes<HTMLButtonElement>>;

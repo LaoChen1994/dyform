@@ -236,10 +236,10 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
       placeholder: e.field.placeholder,
       disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
-      modelValue: e.modelValue ?? "",
+      "model-value": e.modelValue ?? "",
       "onUpdate:modelValue": t,
       onBlur: r[0] || (r[0] = (n) => s("blur", n))
-    }, null, 8, ["id", "type", "placeholder", "disabled", "name", "modelValue"]));
+    }, null, 8, ["id", "type", "placeholder", "disabled", "name", "model-value"]));
   }
 }), Pe = ["value"], De = /* @__PURE__ */ y({
   __name: "Textarea",
@@ -275,9 +275,9 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
       placeholder: e.field.placeholder,
       disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
-      modelValue: e.modelValue ?? "",
+      "model-value": e.modelValue ?? "",
       "onUpdate:modelValue": t[0] || (t[0] = (a) => i("update:modelValue", a))
-    }, null, 8, ["id", "placeholder", "disabled", "name", "modelValue"]));
+    }, null, 8, ["id", "placeholder", "disabled", "name", "model-value"]));
   }
 }), Ee = /* @__PURE__ */ y({
   __name: "SelectTrigger",
@@ -434,7 +434,7 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
     return (s, t) => (d(), x(Me, {
       disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
-      modelValue: e.modelValue != null ? String(e.modelValue) : "",
+      "model-value": e.modelValue != null ? String(e.modelValue) : "",
       "onUpdate:modelValue": t[0] || (t[0] = (a) => i("update:modelValue", a))
     }, {
       default: c(() => [
@@ -462,7 +462,7 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
         })
       ]),
       _: 1
-    }, 8, ["disabled", "name", "modelValue"]));
+    }, 8, ["disabled", "name", "model-value"]));
   }
 }), Oe = /* @__PURE__ */ y({
   __name: "Checkbox",
@@ -644,7 +644,7 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
       class: "flex flex-wrap gap-4",
       disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
-      modelValue: e.modelValue != null ? String(e.modelValue) : "",
+      "model-value": e.modelValue != null ? String(e.modelValue) : "",
       "onUpdate:modelValue": t[0] || (t[0] = (a) => i("update:modelValue", a))
     }, {
       default: c(() => [
@@ -668,7 +668,7 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
         ]))), 128))
       ]),
       _: 1
-    }, 8, ["disabled", "name", "modelValue"]));
+    }, 8, ["disabled", "name", "model-value"]));
   }
 }), We = /* @__PURE__ */ y({
   __name: "DateRenderer",
@@ -686,7 +686,7 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
     return (s, t) => (d(), x(Q, {
       id: e.fieldId,
       type: "date",
-      modelValue: e.modelValue,
+      "model-value": e.modelValue,
       placeholder: e.field.placeholder,
       disabled: typeof e.field.disabled == "boolean" ? e.field.disabled : void 0,
       name: e.field.name,
@@ -695,7 +695,7 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
       "aria-describedby": e.ariaDescribedby,
       "onUpdate:modelValue": t[0] || (t[0] = (a) => i("update:modelValue", a)),
       onBlur: t[1] || (t[1] = (a) => i("blur", a))
-    }, null, 8, ["id", "modelValue", "placeholder", "disabled", "name", "aria-invalid", "aria-required", "aria-describedby"]));
+    }, null, 8, ["id", "model-value", "placeholder", "disabled", "name", "aria-invalid", "aria-required", "aria-describedby"]));
   }
 }), Je = /* @__PURE__ */ y({
   __name: "Switch",
@@ -809,14 +809,14 @@ const qe = ["type", "value"], Q = /* @__PURE__ */ y({
       }, 8, ["for", "class"])) : C("", !0),
       (d(), x(_(m.value), {
         field: e.field,
-        fieldId: t.value,
-        modelValue: e.modelValue,
+        "field-id": t.value,
+        "model-value": e.modelValue,
         "aria-invalid": !!e.error,
         "aria-required": n.value,
         "aria-describedby": u.value,
         "onUpdate:modelValue": v[0] || (v[0] = (S) => s("update:modelValue", S)),
         onBlur: v[1] || (v[1] = (S) => s("blur", S))
-      }, null, 40, ["field", "fieldId", "modelValue", "aria-invalid", "aria-required", "aria-describedby"])),
+      }, null, 40, ["field", "field-id", "model-value", "aria-invalid", "aria-required", "aria-describedby"])),
       e.field.description ? (d(), h("p", {
         key: 1,
         id: a.value,

@@ -1,5 +1,8 @@
 {
   "name": "pdyform",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "A high-performance, schema-driven dynamic form system with React and Vue support.",
   "keywords": [
     "dynamic-form",

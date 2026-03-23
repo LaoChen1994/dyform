@@ -1,5 +1,8 @@
 {
   "name": "pdyform-react",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.1.0",
   "description": "React components for pdyform.",
   "type": "module",

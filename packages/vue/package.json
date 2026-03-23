@@ -1,5 +1,8 @@
 {
   "name": "pdyform-vue",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.1.0",
   "description": "Vue components for pdyform.",
   "type": "module",

@@ -1,5 +1,8 @@
 {
   "name": "pdyform-core",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.1.0",
   "description": "Core logic and schema parser for pdyform.",
   "type": "module",
