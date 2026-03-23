@@ -1,5 +1,11 @@
 # pdyform
 
+## 2.3.1
+
+### Patch Changes
+
+- docs: add framework specific READMEs to react and vue packages
+
 ## 2.3.0
 
 ### Minor Changes

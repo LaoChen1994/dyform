@@ -1,5 +1,11 @@
 # pdyform-react
 
+## 1.1.1
+
+### Patch Changes
+
+- docs: add framework specific READMEs to react and vue packages
+
 ## 1.1.0
 
 ### Minor Changes
