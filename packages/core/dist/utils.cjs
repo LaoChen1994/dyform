@@ -21,6 +21,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var utils_exports = {};
 __export(utils_exports, {
   defaultErrorMessages: () => defaultErrorMessages,
+  flattenElements: () => flattenElements,
   get: () => get,
   getDefaultValues: () => getDefaultValues,
   normalizeFieldValue: () => normalizeFieldValue,
@@ -179,9 +180,22 @@ function getDefaultValues(fields) {
     return acc;
   }, {});
 }
+function flattenElements(elements) {
+  if (!elements) return [];
+  const fields = [];
+  for (const el of elements) {
+    if (el.nodeType === "group" || el.nodeType === "grid") {
+      fields.push(...flattenElements(el.elements));
+    } else {
+      fields.push(el);
+    }
+  }
+  return fields;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   defaultErrorMessages,
+  flattenElements,
   get,
   getDefaultValues,
   normalizeFieldValue,

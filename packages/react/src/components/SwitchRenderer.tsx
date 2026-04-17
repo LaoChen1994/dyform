@@ -6,7 +6,6 @@ const SwitchRenderer: React.FC<FieldRenderContext> = ({
   field,
   value,
   onChange,
-  onBlur,
   fieldId,
   ariaInvalid,
   ariaRequired,
@@ -23,6 +22,7 @@ const SwitchRenderer: React.FC<FieldRenderContext> = ({
         aria-invalid={ariaInvalid}
         aria-required={ariaRequired}
         aria-describedby={ariaDescribedBy}
+      {...field.componentProps}
       />
     </div>
   );

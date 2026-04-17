@@ -30,6 +30,7 @@ const InputRenderer: React.FC<FieldRenderContext> = ({
       aria-invalid={ariaInvalid}
       aria-required={ariaRequired}
       aria-describedby={ariaDescribedBy}
+    {...field.componentProps}
     />
   );
 };

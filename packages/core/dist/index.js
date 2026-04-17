@@ -1,10 +1,11 @@
 import {
   createFormEngine,
   createStore
-} from "./chunk-V4VK2GZU.js";
+} from "./chunk-AEBDE2CG.js";
 import "./chunk-6F4PWJZI.js";
 import {
   defaultErrorMessages,
+  flattenElements,
   get,
   getDefaultValues,
   normalizeFieldValue,
@@ -12,11 +13,12 @@ import {
   validateField,
   validateFieldByName,
   validateForm
-} from "./chunk-T3LQTNYY.js";
+} from "./chunk-7GZLKEKI.js";
 export {
   createFormEngine,
   createStore,
   defaultErrorMessages,
+  flattenElements,
   get,
   getDefaultValues,
   normalizeFieldValue,

@@ -10,6 +10,7 @@ const RadioRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange, o
     disabled={typeof field.disabled === 'boolean' ? field.disabled : undefined}
     name={field.name}
     className="flex flex-wrap gap-4"
+    {...field.componentProps}
   >
     {field.options?.map((opt) => (
       <div key={opt.value} className="flex items-center space-x-2">

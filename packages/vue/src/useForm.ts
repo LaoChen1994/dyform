@@ -1,4 +1,4 @@
-import { ref, onUnmounted, computed } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import { createFormEngine, get } from 'pdyform-core';
 import type { FormSchema, FormRuntimeState } from 'pdyform-core';
 
@@ -7,7 +7,7 @@ export interface UseFormOptions {
 }
 
 export function useForm({ schema }: UseFormOptions) {
-  const engine = createFormEngine(schema.fields, schema.resolver, schema.errorMessages);
+  const engine = createFormEngine(schema, schema.resolver, schema.errorMessages);
   const formState = ref<FormRuntimeState>(engine.store.getState());
 
   const unsubscribe = engine.store.subscribe((state: FormRuntimeState) => {

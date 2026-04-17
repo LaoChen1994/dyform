@@ -1,5 +1,5 @@
-import type { FormField, FormResolver, ErrorMessageTemplates } from './types';
-import { getDefaultValues, normalizeFieldValue, validateFieldByName, validateForm, get, set as setPathValue } from './utils';
+import type { FormField, FormResolver, ErrorMessageTemplates, FormSchema } from './types';
+import { getDefaultValues, normalizeFieldValue, validateFieldByName, validateForm, get, set as setPathValue, flattenElements } from './utils';
 
 // --- Base Store Engine ---
 export type StoreListener<T> = (state: T, prevState: T) => void;
@@ -37,9 +37,16 @@ export function createStore<T>(initialState: T): VanillaStore<T> {
 export interface FormRuntimeState {
   values: Record<string, unknown>;
   errors: Record<string, string>;
+  touched: Record<string, boolean>;
   validatingFields: string[];
   isSubmitting: boolean;
+  fieldProps: Record<string, Partial<FormField>>;
 }
+
+export type FieldChangeContext = {
+  value: unknown;
+  engine: FormEngine;
+};
 
 export interface FormEngine {
   store: VanillaStore<FormRuntimeState>;
@@ -47,21 +54,51 @@ export interface FormEngine {
   setFieldBlur: (name: string) => Promise<void>;
   setSubmitting: (isSubmitting: boolean) => void;
   runSubmitValidation: () => Promise<{ state: FormRuntimeState; hasError: boolean }>;
+  setFieldProps: (name: string, props: Partial<FormField>) => void;
+  subscribeToChange: (name: string, listener: (context: FieldChangeContext) => void) => () => void;
 }
 
 export function createFormEngine(
-  fields: FormField[],
+  schemaOrFields: FormField[] | FormSchema,
   resolver?: FormResolver,
   errorMessages?: ErrorMessageTemplates
 ): FormEngine {
+  const isSchema = schemaOrFields && !Array.isArray(schemaOrFields);
+  const schema = isSchema ? (schemaOrFields as FormSchema) : undefined;
+  
+  const fields: FormField[] = Array.isArray(schemaOrFields) 
+    ? schemaOrFields 
+    : (schema?.elements ? flattenElements(schema.elements) : (schema?.fields || []));
+
   const store = createStore<FormRuntimeState>({
     values: getDefaultValues(fields),
     errors: {},
+    touched: {},
     validatingFields: [],
     isSubmitting: false,
+    fieldProps: {},
   });
 
   const { getState, setState } = store;
+  const changeListeners: Record<string, Set<(context: FieldChangeContext) => void>> = {};
+
+  const subscribeToChange = (name: string, listener: (context: FieldChangeContext) => void) => {
+    if (!changeListeners[name]) changeListeners[name] = new Set();
+    changeListeners[name].add(listener);
+    return () => changeListeners[name].delete(listener);
+  };
+
+  const setFieldProps = (name: string, props: Partial<FormField>) => {
+    setState((s) => ({
+      fieldProps: {
+        ...s.fieldProps,
+        [name]: {
+          ...s.fieldProps[name],
+          ...props,
+        },
+      },
+    }));
+  };
 
   const setFieldValue = async (name: string, rawValue: unknown) => {
     const field = fields.find((f) => f.name === name);
@@ -69,6 +106,7 @@ export function createFormEngine(
 
     setState((s) => ({
       values: setPathValue(s.values, name, normalizedValue),
+      touched: { ...s.touched, [name]: true },
     }));
 
     const hasExistingError = !!getState().errors[name];
@@ -92,11 +130,30 @@ export function createFormEngine(
         }));
       }
     }
+
+    // Trigger side effects
+    if (changeListeners[name] && engine) {
+      changeListeners[name].forEach((listener) => listener({ value: normalizedValue, engine }));
+    }
+
+    // Validate dependent fields automatically
+    const dependentFields = fields.filter((f) => f.dependencies?.includes(name));
+    for (const df of dependentFields) {
+      const dfValue = get(getState().values, df.name);
+      validateFieldByName(fields, df.name, dfValue, resolver, getState().values, errorMessages)
+        .then((err) => {
+          setState((s) => ({
+            errors: { ...s.errors, [df.name]: err || '' },
+          }));
+        })
+        .catch(() => {});
+    }
   };
 
   const setFieldBlur = async (name: string) => {
     setState((s) => ({
       validatingFields: [...s.validatingFields, name],
+      touched: { ...s.touched, [name]: true },
     }));
 
     try {
@@ -122,10 +179,16 @@ export function createFormEngine(
     const errors = await validateForm(fields, currentValues, resolver, errorMessages);
     const hasError = Object.keys(errors).length > 0;
 
-    setState({
+    const allTouched = fields.reduce((acc, field) => {
+      acc[field.name] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+
+    setState((s) => ({
       errors,
+      touched: { ...s.touched, ...allTouched },
       isSubmitting: false,
-    });
+    }));
 
     return {
       state: getState(),
@@ -133,11 +196,19 @@ export function createFormEngine(
     };
   };
 
-  return {
+  const engine: FormEngine = {
     store,
     setFieldValue,
     setFieldBlur,
     setSubmitting,
     runSubmitValidation,
+    setFieldProps,
+    subscribeToChange,
   };
+
+  if (schema?.effects) {
+    schema.effects(engine);
+  }
+
+  return engine;
 }

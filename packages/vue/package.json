@@ -25,7 +25,7 @@
     "dev": "vite",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src/**/*.{ts,vue} --no-error-on-unmatched-pattern"
+    "lint": "oxlint --ignore-pattern dist"
   },
   "dependencies": {
     "pdyform-core": "workspace:*",

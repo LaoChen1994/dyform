@@ -1,5 +1,6 @@
 import {
   defaultErrorMessages,
+  flattenElements,
   get,
   getDefaultValues,
   normalizeFieldValue,
@@ -7,9 +8,10 @@ import {
   validateField,
   validateFieldByName,
   validateForm
-} from "./chunk-T3LQTNYY.js";
+} from "./chunk-7GZLKEKI.js";
 export {
   defaultErrorMessages,
+  flattenElements,
   get,
   getDefaultValues,
   normalizeFieldValue,

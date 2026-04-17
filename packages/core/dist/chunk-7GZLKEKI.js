@@ -148,6 +148,18 @@ function getDefaultValues(fields) {
     return acc;
   }, {});
 }
+function flattenElements(elements) {
+  if (!elements) return [];
+  const fields = [];
+  for (const el of elements) {
+    if (el.nodeType === "group" || el.nodeType === "grid") {
+      fields.push(...flattenElements(el.elements));
+    } else {
+      fields.push(el);
+    }
+  }
+  return fields;
+}
 
 export {
   defaultErrorMessages,
@@ -157,5 +169,6 @@ export {
   validateField,
   validateFieldByName,
   validateForm,
-  getDefaultValues
+  getDefaultValues,
+  flattenElements
 };

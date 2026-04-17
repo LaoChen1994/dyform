@@ -1,12 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { 
+  get, 
+  set, 
   validateField, 
-  validateFieldByName, 
-  validateForm, 
-  normalizeFieldValue, 
-  getDefaultValues,
-  get,
-  set
+  validateForm
 } from '../src/utils';
 import { FormField } from '../src/types';
 

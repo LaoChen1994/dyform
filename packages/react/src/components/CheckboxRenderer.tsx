@@ -24,6 +24,7 @@ const CheckboxRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange
               onChange(next);
             }}
             onBlur={onBlur}
+            {...field.componentProps}
           />
           <Label htmlFor={`checkbox-${field.name}-${opt.value}`} className="font-normal">
             {opt.label}

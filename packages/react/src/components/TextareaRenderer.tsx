@@ -11,6 +11,7 @@ const TextareaRenderer: React.FC<FieldRenderContext> = ({ field, value, onChange
     onBlur={onBlur}
     disabled={typeof field.disabled === 'boolean' ? field.disabled : undefined}
     name={field.name}
+    {...field.componentProps}
   />
 );
 

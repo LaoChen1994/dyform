@@ -49,39 +49,43 @@ export const FormFieldRenderer: React.FC<FormFieldRendererProps> = ({
     error ? errorId : null,
   ].filter(Boolean).join(' ');
 
+  const layout = field.layout || 'vertical';
+
   return (
-    <div className={`space-y-2 ${field.className || ''}`}>
-      {label && (
-        <Label htmlFor={fieldId} className={isRequired ? "flex items-center gap-1" : ""}>
+    <div className={`${layout === 'horizontal' ? 'flex flex-row items-center gap-4' : 'space-y-2'} ${field.className || ''}`}>
+      {label && layout !== 'none' && (
+        <Label htmlFor={fieldId} className={isRequired ? "flex items-center gap-1 shrink-0" : "shrink-0"}>
           {label}
           {isRequired && <span className="text-destructive">*</span>}
         </Label>
       )}
       
-      <FieldComponent
-        field={field}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        fieldId={fieldId}
-        errorId={errorId}
-        descriptionId={descriptionId}
-        ariaInvalid={!!error}
-        ariaRequired={isRequired}
-        ariaDescribedBy={describedBy || undefined}
-      />
+      <div className={layout === 'horizontal' ? 'flex-1 space-y-2' : 'space-y-2'}>
+        <FieldComponent
+          field={field}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          fieldId={fieldId}
+          errorId={errorId}
+          descriptionId={descriptionId}
+          ariaInvalid={!!error}
+          ariaRequired={isRequired}
+          ariaDescribedBy={describedBy || undefined}
+        />
 
-      {description && (
-        <p id={descriptionId} className="text-[0.8rem] text-muted-foreground">
-          {description}
-        </p>
-      )}
-      
-      {error && (
-        <p id={errorId} className="text-[0.8rem] font-medium text-destructive">
-          {error}
-        </p>
-      )}
+        {description && (
+          <p id={descriptionId} className="text-[0.8rem] text-muted-foreground">
+            {description}
+          </p>
+        )}
+        
+        {error && (
+          <p id={errorId} className="text-[0.8rem] font-medium text-destructive">
+            {error}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

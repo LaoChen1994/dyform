@@ -69,13 +69,17 @@ export declare function useForm({ schema }: UseFormOptions): {
     state: Ref<    {
     values: Record<string, unknown>;
     errors: Record<string, string>;
+    touched: Record<string, boolean>;
     validatingFields: string[];
     isSubmitting: boolean;
+    fieldProps: Record<string, Partial<FormField>>;
     }, FormRuntimeState | {
     values: Record<string, unknown>;
     errors: Record<string, string>;
+    touched: Record<string, boolean>;
     validatingFields: string[];
     isSubmitting: boolean;
+    fieldProps: Record<string, Partial<FormField>>;
     }>;
     setValue: (name: string, value: any) => Promise<void>;
     getValue: (name: string) => unknown;

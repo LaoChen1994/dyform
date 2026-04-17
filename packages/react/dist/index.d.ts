@@ -1,6 +1,7 @@
 import * as React from 'react';
 import React__default from 'react';
-import { FormEngine, FormRuntimeState, FormSchema, FormField } from 'pdyform-core';
+import * as pdyform_core from 'pdyform-core';
+import { FormEngine, FormRuntimeState, FormSchema, FormField, FormElement } from 'pdyform-core';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import * as class_variance_authority_types from 'class-variance-authority/types';
 import * as LabelPrimitive from '@radix-ui/react-label';
@@ -25,16 +26,16 @@ interface UseFormReturn {
     }>;
     reset: () => void;
     useWatch: (name: string) => any;
+    useFieldState: (name: string) => {
+        value: any;
+        error?: string;
+        touched?: boolean;
+        isValidating: boolean;
+        values: any;
+        fieldProps?: Partial<pdyform_core.FormField>;
+    };
 }
 declare function useForm({ schema }: UseFormOptions): UseFormReturn;
-
-interface DynamicFormProps {
-    schema: FormSchema;
-    onSubmit: (values: Record<string, any>) => void;
-    className?: string;
-    form?: UseFormReturn;
-}
-declare const DynamicForm: React__default.FC<DynamicFormProps>;
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 declare const Input: React.ForwardRefExoticComponent<InputProps & React.RefAttributes<HTMLInputElement>>;
@@ -103,6 +104,15 @@ declare const SwitchRenderer: React__default.FC<FieldRenderContext>;
  */
 declare const defaultComponentMap: FieldComponentMap;
 
+interface DynamicFormProps {
+    schema: FormSchema;
+    onSubmit: (values: Record<string, any>) => void;
+    className?: string;
+    form?: UseFormReturn;
+    componentMap?: FieldComponentMap;
+}
+declare const DynamicForm: React__default.FC<DynamicFormProps>;
+
 interface FormFieldRendererProps {
     field: FormField;
     value: any;
@@ -123,4 +133,18 @@ interface FormFieldRendererProps {
 }
 declare const FormFieldRenderer: React__default.FC<FormFieldRendererProps>;
 
-export { Checkbox, CheckboxRenderer, DateRenderer, DynamicForm, type FieldComponentMap, type FieldRenderContext, type FieldRenderer, FormFieldRenderer, type FormFieldRendererProps, Input, InputRenderer, Label, RadioGroup, RadioGroupItem, RadioRenderer, Select, SelectContent, SelectGroup, SelectItem, SelectRenderer, SelectTrigger, SelectValue, Switch, SwitchRenderer, Textarea, TextareaRenderer, type UseFormOptions, type UseFormReturn, defaultComponentMap, useForm };
+interface FormElementRendererProps {
+    elements: FormElement[];
+    form: UseFormReturn;
+    componentMap?: FieldComponentMap;
+}
+declare const FormElementRenderer: React__default.FC<FormElementRendererProps>;
+
+interface FieldItemProps {
+    field: FormField;
+    form: UseFormReturn;
+    componentMap?: FieldComponentMap;
+}
+declare const FieldItem: React__default.FC<FieldItemProps>;
+
+export { Checkbox, CheckboxRenderer, DateRenderer, DynamicForm, type FieldComponentMap, FieldItem, type FieldItemProps, type FieldRenderContext, type FieldRenderer, FormElementRenderer, type FormElementRendererProps, FormFieldRenderer, type FormFieldRendererProps, Input, InputRenderer, Label, RadioGroup, RadioGroupItem, RadioRenderer, Select, SelectContent, SelectGroup, SelectItem, SelectRenderer, SelectTrigger, SelectValue, Switch, SwitchRenderer, Textarea, TextareaRenderer, type UseFormOptions, type UseFormReturn, defaultComponentMap, useForm };

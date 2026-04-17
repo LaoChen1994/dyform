@@ -14,21 +14,50 @@ export interface UseFormReturn {
   validate: () => Promise<{ hasError: boolean; values: any; state: FormRuntimeState }>;
   reset: () => void;
   useWatch: (name: string) => any;
+  useFieldState: (name: string) => { value: any; error?: string; touched?: boolean; isValidating: boolean; values: any; fieldProps?: Partial<import('pdyform-core').FormField> };
 }
 
 export function useForm({ schema }: UseFormOptions): UseFormReturn {
-  const engine = useMemo(() => createFormEngine(schema.fields, schema.resolver, schema.errorMessages), [schema]);
+  const engine = useMemo(() => createFormEngine(schema, schema.resolver, schema.errorMessages), [schema]);
   const state = useSyncExternalStore(
     (listener) => engine.store.subscribe(listener),
     engine.store.getState
   );
 
-  // 细粒度订阅 Hook：仅当特定 name 的字段值变化时，所在的子组件才会重渲染
+  // Still provided for backward compatibility / simple primitive watching
   const useWatch = useCallback((name: string) => {
     return useSyncExternalStore(
       (listener) => engine.store.subscribe(listener),
       () => get(engine.store.getState().values, name)
     );
+  }, [engine]);
+
+  // To avoid useSyncExternalStore recreating object refs and causing re-renders, 
+  // we do granular subscriptions for the field item.
+  const useFieldState = useCallback((name: string) => {
+    const value = useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => get(engine.store.getState().values, name)
+    );
+    const error = useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => engine.store.getState().errors[name]
+    );
+    const touched = useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => engine.store.getState().touched[name]
+    );
+    const isValidating = useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => engine.store.getState().validatingFields.includes(name)
+    );
+    // values is needed for disabled/hidden calculations
+    const values = useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => engine.store.getState().values
+    );
+
+    return { value, error, touched, isValidating, values };
   }, [engine]);
 
   const setValue = useCallback(async (name: string, value: any) => {
@@ -54,6 +83,8 @@ export function useForm({ schema }: UseFormOptions): UseFormReturn {
     engine.store.setState({
       values: {}, 
       errors: {},
+      touched: {},
+      validatingFields: [],
       isSubmitting: false,
     });
   }, [engine]);
@@ -67,5 +98,6 @@ export function useForm({ schema }: UseFormOptions): UseFormReturn {
     validate,
     reset,
     useWatch,
+    useFieldState,
   };
 }

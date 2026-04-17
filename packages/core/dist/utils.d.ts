@@ -1,4 +1,4 @@
-import { ErrorMessageTemplates, FormField, FormResolver } from './types.js';
+import { ErrorMessageTemplates, FormElement, FormField, FormResolver } from './types.js';
 
 /**
  * Default error message templates
@@ -17,5 +17,6 @@ declare function validateField(value: unknown, field: FormField, customMessages?
 declare function validateFieldByName(fields: FormField[], name: string, value: unknown, resolver?: FormResolver, allValues?: Record<string, unknown>, customMessages?: ErrorMessageTemplates): Promise<string | null>;
 declare function validateForm(fields: FormField[], values: Record<string, unknown>, resolver?: FormResolver, customMessages?: ErrorMessageTemplates): Promise<Record<string, string>>;
 declare function getDefaultValues(fields: FormField[]): Record<string, unknown>;
+declare function flattenElements(elements?: FormElement[]): FormField[];
 
-export { defaultErrorMessages, get, getDefaultValues, normalizeFieldValue, set, validateField, validateFieldByName, validateForm };
+export { defaultErrorMessages, flattenElements, get, getDefaultValues, normalizeFieldValue, set, validateField, validateFieldByName, validateForm };

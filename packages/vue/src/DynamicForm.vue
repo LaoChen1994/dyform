@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { FormSchema } from 'pdyform-core';
-import { get } from 'pdyform-core';
+import { get, flattenElements } from 'pdyform-core';
 import FormFieldRenderer from './FormFieldRenderer.vue';
 import { useForm, type UseFormReturn } from './useForm';
 
@@ -39,7 +39,8 @@ const handleSubmit = async () => {
   const { hasError, values } = await form.validate();
   
   if (hasError) {
-    const firstErrorField = props.schema.fields.find(f => formState.value.errors[f.name]);
+    const allFields = flattenElements(props.schema.elements || props.schema.fields || []);
+    const firstErrorField = allFields.find(f => formState.value.errors[f.name]);
     if (firstErrorField) {
       const element = document.getElementById(`field-${firstErrorField.name}`);
       element?.focus();

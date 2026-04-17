@@ -1,1 +1,2 @@
+pnpm lint:all
 pnpm test:all

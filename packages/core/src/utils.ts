@@ -1,4 +1,4 @@
-import type { FormField, FormResolver, ValidationRule, ErrorMessageTemplates } from './types';
+import type { FormField, FormElement, FormResolver, ValidationRule, ErrorMessageTemplates } from './types';
 
 function parseNumberish(value: unknown): number | null {
   if (typeof value === 'number') return Number.isNaN(value) ? null : value;
@@ -206,4 +206,19 @@ export function getDefaultValues(fields: FormField[]): Record<string, unknown> {
     acc[field.name] = field.defaultValue !== undefined ? field.defaultValue : (field.type === 'checkbox' ? [] : '');
     return acc;
   }, {} as Record<string, unknown>);
+}
+export function flattenElements(elements?: FormElement[]): FormField[] {
+  if (!elements) return [];
+  const fields: FormField[] = [];
+  
+  for (const el of elements) {
+    if (el.nodeType === 'group' || el.nodeType === 'grid') {
+      fields.push(...flattenElements(el.elements));
+    } else {
+      // By default, if nodeType is not 'group' or 'grid', it's treated as a FormField
+      fields.push(el as FormField);
+    }
+  }
+  
+  return fields;
 }
