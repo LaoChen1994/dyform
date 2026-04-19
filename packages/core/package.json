@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Core logic and schema parser for pdyform.",
   "type": "module",
   "main": "./dist/index.cjs",

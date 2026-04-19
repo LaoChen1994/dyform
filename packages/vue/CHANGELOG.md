@@ -1,5 +1,13 @@
 # pdyform-vue
 
+## 1.1.2
+
+### Patch Changes
+
+- chore: migrate from eslint/prettier to oxlint and update core logic
+- Updated dependencies
+  - pdyform-core@1.1.1
+
 ## 1.1.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # pdyform-core
 
+## 1.1.1
+
+### Patch Changes
+
+- chore: migrate from eslint/prettier to oxlint and update core logic
+
 ## 1.1.0
 
 ### Minor Changes
