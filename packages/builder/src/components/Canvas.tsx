@@ -10,7 +10,15 @@ import { useBuilderStore } from '../store';
 import { DynamicForm } from 'pdyform-react';
 import type { FormElement } from 'pdyform-core';
 
-function SortableFieldWrapper({ element }: { element: FormElement }) {
+const SortableFieldWrapper = React.memo(({ 
+  element, 
+  isSelected, 
+  onSelect 
+}: { 
+  element: FormElement; 
+  isSelected: boolean; 
+  onSelect: (id: string) => void;
+}) => {
   const {
     attributes,
     listeners,
@@ -18,16 +26,18 @@ function SortableFieldWrapper({ element }: { element: FormElement }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: element.id! });
-  const selectElement = useBuilderStore((s) => s.selectElement);
-  const selectedElementId = useBuilderStore((s) => s.selectedElementId);
+  } = useSortable({ 
+    id: element.id!,
+    data: {
+      isElement: true,
+      element
+    }
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-  const isSelected = selectedElementId === element.id;
 
   return (
     <div
@@ -35,7 +45,7 @@ function SortableFieldWrapper({ element }: { element: FormElement }) {
       style={style}
       onClick={(e) => {
         e.stopPropagation();
-        selectElement(element.id!);
+        onSelect(element.id!);
       }}
       className={`relative p-4 mb-2 rounded border-2 transition-colors cursor-pointer bg-white ${
         isSelected
@@ -55,12 +65,13 @@ function SortableFieldWrapper({ element }: { element: FormElement }) {
       </div>
     </div>
   );
-}
+});
 
 export function Canvas() {
   const schema = useBuilderStore((s) => s.schema);
   const elements = schema.elements || [];
   const selectElement = useBuilderStore((s) => s.selectElement);
+  const selectedElementId = useBuilderStore((s) => s.selectedElementId);
 
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas-droppable',
@@ -92,7 +103,12 @@ export function Canvas() {
           strategy={verticalListSortingStrategy}
         >
           {elements.map((element) => (
-            <SortableFieldWrapper key={element.id} element={element} />
+            <SortableFieldWrapper 
+              key={element.id} 
+              element={element} 
+              isSelected={selectedElementId === element.id}
+              onSelect={selectElement}
+            />
           ))}
         </SortableContext>
       </div>

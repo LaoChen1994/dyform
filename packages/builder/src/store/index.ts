@@ -1,4 +1,5 @@
-import { create } from 'zustand';
+import { create, UseBoundStore, StoreApi } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 import type { FormSchema, FormElement } from 'pdyform-core';
 
 interface BuilderState {
@@ -12,69 +13,80 @@ interface BuilderState {
   moveElement: (fromIndex: number, toIndex: number) => void;
 }
 
-export const useBuilderStore = create<BuilderState>((set) => ({
-  schema: {
-    title: 'New Form',
-    elements: [],
-  },
-  selectedElementId: null,
-  setSchema: (schema) => set({ schema }),
-  selectElement: (id) => set({ selectedElementId: id }),
-  addElement: (element) =>
-    set((state) => ({
-      schema: {
-        ...state.schema,
-        elements: [...(state.schema.elements || []), element],
-      },
-    })),
-  updateElement: (id, updates) =>
-    set((state) => {
-      const updateNode = (elements: FormElement[]): FormElement[] => {
-        return elements.map((el) => {
-          if (el.id === id) {
-            return { ...el, ...updates } as FormElement;
+export const useBuilderStore: UseBoundStore<StoreApi<BuilderState>> = create<BuilderState>()(
+  immer((set) => ({
+    schema: {
+      title: 'New Form',
+      elements: [],
+    },
+    selectedElementId: null,
+    setSchema: (schema) =>
+      set((state) => {
+        state.schema = schema;
+      }),
+    selectElement: (id) =>
+      set((state) => {
+        state.selectedElementId = id;
+      }),
+    addElement: (element) =>
+      set((state) => {
+        if (!state.schema.elements) {
+          state.schema.elements = [];
+        }
+        state.schema.elements.push(element);
+      }),
+    updateElement: (id, updates) =>
+      set((state) => {
+        const updateNode = (elements: FormElement[]) => {
+          for (let i = 0; i < elements.length; i++) {
+            if (elements[i].id === id) {
+              Object.assign(elements[i], updates);
+              return true;
+            }
+            if (elements[i].nodeType === 'group' || elements[i].nodeType === 'grid') {
+              if (elements[i].elements) {
+                if (updateNode(elements[i].elements!)) {
+                  return true;
+                }
+              }
+            }
           }
-          if (el.nodeType === 'group' || el.nodeType === 'grid') {
-            return { ...el, elements: updateNode(el.elements) } as FormElement;
+          return false;
+        };
+        if (state.schema.elements) {
+          updateNode(state.schema.elements);
+        }
+      }),
+    removeElement: (id) =>
+      set((state) => {
+        const removeNode = (elements: FormElement[]) => {
+          for (let i = 0; i < elements.length; i++) {
+            if (elements[i].id === id) {
+              elements.splice(i, 1);
+              return true;
+            }
+            if (elements[i].nodeType === 'group' || elements[i].nodeType === 'grid') {
+              if (elements[i].elements) {
+                if (removeNode(elements[i].elements!)) {
+                  return true;
+                }
+              }
+            }
           }
-          return el;
-        });
-      };
-      return {
-        schema: {
-          ...state.schema,
-          elements: updateNode(state.schema.elements || []),
-        },
-      };
-    }),
-  removeElement: (id) =>
-    set((state) => {
-      const removeNode = (elements: FormElement[]): FormElement[] => {
-        return elements.filter((el) => el.id !== id).map((el) => {
-          if (el.nodeType === 'group' || el.nodeType === 'grid') {
-            return { ...el, elements: removeNode(el.elements) } as FormElement;
-          }
-          return el;
-        });
-      };
-      return {
-        schema: {
-          ...state.schema,
-          elements: removeNode(state.schema.elements || []),
-        },
-        selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
-      };
-    }),
-  moveElement: (fromIndex, toIndex) =>
-    set((state) => {
-      const elements = [...(state.schema.elements || [])];
-      const [moved] = elements.splice(fromIndex, 1);
-      elements.splice(toIndex, 0, moved);
-      return {
-        schema: {
-          ...state.schema,
-          elements,
-        },
-      };
-    }),
-}));
+          return false;
+        };
+        if (state.schema.elements) {
+          removeNode(state.schema.elements);
+        }
+        if (state.selectedElementId === id) {
+          state.selectedElementId = null;
+        }
+      }),
+    moveElement: (fromIndex, toIndex) =>
+      set((state) => {
+        if (!state.schema.elements) return;
+        const [moved] = state.schema.elements.splice(fromIndex, 1);
+        state.schema.elements.splice(toIndex, 0, moved);
+      }),
+  }))
+);

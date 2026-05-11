@@ -54,26 +54,36 @@ export function PropertyPanel() {
 
   useEffect(() => {
     if (!selectedElement) return;
+    
+    let timer: ReturnType<typeof setTimeout>;
+    
     const unsubscribe = form.engine.store.subscribe(() => {
-      const state = form.engine.store.getState();
-      const currentVals = state.values;
-      if (currentVals && Object.keys(currentVals).length > 0) {
-        const updates: any = {
-          label: currentVals.label,
-          name: currentVals.name,
-          placeholder: currentVals.placeholder,
-        };
-        
-        if (currentVals.required) {
-           updates.validations = [{ type: 'required' }];
-        } else {
-           updates.validations = [];
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const state = form.engine.store.getState();
+        const currentVals = state.values;
+        if (currentVals && Object.keys(currentVals).length > 0) {
+          const updates: any = {
+            label: currentVals.label,
+            name: currentVals.name,
+            placeholder: currentVals.placeholder,
+          };
+          
+          if (currentVals.required) {
+             updates.validations = [{ type: 'required' }];
+          } else {
+             updates.validations = [];
+          }
+          
+          updateElement(selectedElement.id!, updates);
         }
-        
-        updateElement(selectedElement.id!, updates);
-      }
+      }, 300);
     });
-    return unsubscribe;
+    
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, [form.engine.store, selectedElement?.id, updateElement]);
 
   if (!selectedElement) {

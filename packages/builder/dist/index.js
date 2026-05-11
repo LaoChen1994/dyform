@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.tsx
@@ -23,72 +33,83 @@ __export(index_exports, {
   FormBuilder: () => FormBuilder
 });
 module.exports = __toCommonJS(index_exports);
+var import_react3 = require("react");
 var import_core3 = require("@dnd-kit/core");
 
 // src/store/index.ts
 var import_zustand = require("zustand");
-var useBuilderStore = (0, import_zustand.create)((set) => ({
-  schema: {
-    title: "New Form",
-    elements: []
-  },
-  selectedElementId: null,
-  setSchema: (schema) => set({ schema }),
-  selectElement: (id) => set({ selectedElementId: id }),
-  addElement: (element) => set((state) => ({
+var import_immer = require("zustand/middleware/immer");
+var useBuilderStore = (0, import_zustand.create)()(
+  (0, import_immer.immer)((set) => ({
     schema: {
-      ...state.schema,
-      elements: [...state.schema.elements || [], element]
-    }
-  })),
-  updateElement: (id, updates) => set((state) => {
-    const updateNode = (elements) => {
-      return elements.map((el) => {
-        if (el.id === id) {
-          return { ...el, ...updates };
-        }
-        if (el.nodeType === "group" || el.nodeType === "grid") {
-          return { ...el, elements: updateNode(el.elements) };
-        }
-        return el;
-      });
-    };
-    return {
-      schema: {
-        ...state.schema,
-        elements: updateNode(state.schema.elements || [])
+      title: "New Form",
+      elements: []
+    },
+    selectedElementId: null,
+    setSchema: (schema) => set((state) => {
+      state.schema = schema;
+    }),
+    selectElement: (id) => set((state) => {
+      state.selectedElementId = id;
+    }),
+    addElement: (element) => set((state) => {
+      if (!state.schema.elements) {
+        state.schema.elements = [];
       }
-    };
-  }),
-  removeElement: (id) => set((state) => {
-    const removeNode = (elements) => {
-      return elements.filter((el) => el.id !== id).map((el) => {
-        if (el.nodeType === "group" || el.nodeType === "grid") {
-          return { ...el, elements: removeNode(el.elements) };
+      state.schema.elements.push(element);
+    }),
+    updateElement: (id, updates) => set((state) => {
+      const updateNode = (elements) => {
+        for (let i = 0; i < elements.length; i++) {
+          if (elements[i].id === id) {
+            Object.assign(elements[i], updates);
+            return true;
+          }
+          if (elements[i].nodeType === "group" || elements[i].nodeType === "grid") {
+            if (elements[i].elements) {
+              if (updateNode(elements[i].elements)) {
+                return true;
+              }
+            }
+          }
         }
-        return el;
-      });
-    };
-    return {
-      schema: {
-        ...state.schema,
-        elements: removeNode(state.schema.elements || [])
-      },
-      selectedElementId: state.selectedElementId === id ? null : state.selectedElementId
-    };
-  }),
-  moveElement: (fromIndex, toIndex) => set((state) => {
-    const elements = [...state.schema.elements || []];
-    const [moved] = elements.splice(fromIndex, 1);
-    elements.splice(toIndex, 0, moved);
-    return {
-      schema: {
-        ...state.schema,
-        elements
+        return false;
+      };
+      if (state.schema.elements) {
+        updateNode(state.schema.elements);
       }
-    };
-  })
-}));
+    }),
+    removeElement: (id) => set((state) => {
+      const removeNode = (elements) => {
+        for (let i = 0; i < elements.length; i++) {
+          if (elements[i].id === id) {
+            elements.splice(i, 1);
+            return true;
+          }
+          if (elements[i].nodeType === "group" || elements[i].nodeType === "grid") {
+            if (elements[i].elements) {
+              if (removeNode(elements[i].elements)) {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      };
+      if (state.schema.elements) {
+        removeNode(state.schema.elements);
+      }
+      if (state.selectedElementId === id) {
+        state.selectedElementId = null;
+      }
+    }),
+    moveElement: (fromIndex, toIndex) => set((state) => {
+      if (!state.schema.elements) return;
+      const [moved] = state.schema.elements.splice(fromIndex, 1);
+      state.schema.elements.splice(toIndex, 0, moved);
+    })
+  }))
+);
 
 // src/components/Sidebar.tsx
 var import_core = require("@dnd-kit/core");
@@ -128,12 +149,17 @@ function Sidebar() {
 }
 
 // src/components/Canvas.tsx
+var import_react = __toESM(require("react"));
 var import_core2 = require("@dnd-kit/core");
 var import_sortable = require("@dnd-kit/sortable");
 var import_utilities = require("@dnd-kit/utilities");
 var import_pdyform_react = require("pdyform-react");
 var import_jsx_runtime2 = require("react/jsx-runtime");
-function SortableFieldWrapper({ element }) {
+var SortableFieldWrapper = import_react.default.memo(({
+  element,
+  isSelected,
+  onSelect
+}) => {
   const {
     attributes,
     listeners,
@@ -141,14 +167,17 @@ function SortableFieldWrapper({ element }) {
     transform,
     transition,
     isDragging
-  } = (0, import_sortable.useSortable)({ id: element.id });
-  const selectElement = useBuilderStore((s) => s.selectElement);
-  const selectedElementId = useBuilderStore((s) => s.selectedElementId);
+  } = (0, import_sortable.useSortable)({
+    id: element.id,
+    data: {
+      isElement: true,
+      element
+    }
+  });
   const style = {
     transform: import_utilities.CSS.Transform.toString(transform),
     transition
   };
-  const isSelected = selectedElementId === element.id;
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
     "div",
     {
@@ -156,7 +185,7 @@ function SortableFieldWrapper({ element }) {
       style,
       onClick: (e) => {
         e.stopPropagation();
-        selectElement(element.id);
+        onSelect(element.id);
       },
       className: `relative p-4 mb-2 rounded border-2 transition-colors cursor-pointer bg-white ${isSelected ? "border-blue-500 bg-blue-50/10" : "border-transparent hover:border-slate-200 hover:bg-slate-50"} ${isDragging ? "opacity-30" : ""}`,
       children: [
@@ -174,11 +203,12 @@ function SortableFieldWrapper({ element }) {
       ]
     }
   );
-}
+});
 function Canvas() {
   const schema = useBuilderStore((s) => s.schema);
   const elements = schema.elements || [];
   const selectElement = useBuilderStore((s) => s.selectElement);
+  const selectedElementId = useBuilderStore((s) => s.selectedElementId);
   const { setNodeRef, isOver } = (0, import_core2.useDroppable)({
     id: "canvas-droppable"
   });
@@ -200,7 +230,15 @@ function Canvas() {
               {
                 items: elements.map((e) => e.id),
                 strategy: import_sortable.verticalListSortingStrategy,
-                children: elements.map((element) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SortableFieldWrapper, { element }, element.id))
+                children: elements.map((element) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  SortableFieldWrapper,
+                  {
+                    element,
+                    isSelected: selectedElementId === element.id,
+                    onSelect: selectElement
+                  },
+                  element.id
+                ))
               }
             )
           ]
@@ -211,7 +249,7 @@ function Canvas() {
 }
 
 // src/components/PropertyPanel.tsx
-var import_react = require("react");
+var import_react2 = require("react");
 var import_pdyform_react2 = require("pdyform-react");
 var import_jsx_runtime3 = require("react/jsx-runtime");
 function PropertyPanel() {
@@ -221,7 +259,7 @@ function PropertyPanel() {
   const updateElement = useBuilderStore((s) => s.updateElement);
   const removeElement = useBuilderStore((s) => s.removeElement);
   const selectedElement = elements.find((e) => e.id === selectedElementId);
-  const propertySchema = (0, import_react.useMemo)(() => {
+  const propertySchema = (0, import_react2.useMemo)(() => {
     if (!selectedElement) return { elements: [] };
     return {
       elements: [
@@ -259,26 +297,33 @@ function PropertyPanel() {
     };
   }, [selectedElement?.id]);
   const form = (0, import_pdyform_react2.useForm)({ schema: propertySchema });
-  (0, import_react.useEffect)(() => {
+  (0, import_react2.useEffect)(() => {
     if (!selectedElement) return;
+    let timer;
     const unsubscribe = form.engine.store.subscribe(() => {
-      const state = form.engine.store.getState();
-      const currentVals = state.values;
-      if (currentVals && Object.keys(currentVals).length > 0) {
-        const updates = {
-          label: currentVals.label,
-          name: currentVals.name,
-          placeholder: currentVals.placeholder
-        };
-        if (currentVals.required) {
-          updates.validations = [{ type: "required" }];
-        } else {
-          updates.validations = [];
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const state = form.engine.store.getState();
+        const currentVals = state.values;
+        if (currentVals && Object.keys(currentVals).length > 0) {
+          const updates = {
+            label: currentVals.label,
+            name: currentVals.name,
+            placeholder: currentVals.placeholder
+          };
+          if (currentVals.required) {
+            updates.validations = [{ type: "required" }];
+          } else {
+            updates.validations = [];
+          }
+          updateElement(selectedElement.id, updates);
         }
-        updateElement(selectedElement.id, updates);
-      }
+      }, 300);
     });
-    return unsubscribe;
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, [form.engine.store, selectedElement?.id, updateElement]);
   if (!selectedElement) {
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-80 border-l border-slate-200 bg-slate-50 p-4 text-slate-400 text-sm text-center pt-20", children: "\u8BF7\u5148\u5728\u753B\u5E03\u4E2D\u9009\u4E2D\u4E00\u4E2A\u7EC4\u4EF6" });
@@ -309,6 +354,7 @@ function PropertyPanel() {
 }
 
 // src/index.tsx
+var import_pdyform_react3 = require("pdyform-react");
 var import_jsx_runtime4 = require("react/jsx-runtime");
 function FormBuilder() {
   const schema = useBuilderStore((s) => s.schema);
@@ -316,7 +362,12 @@ function FormBuilder() {
   const addElement = useBuilderStore((s) => s.addElement);
   const moveElement = useBuilderStore((s) => s.moveElement);
   const selectElement = useBuilderStore((s) => s.selectElement);
+  const [activeData, setActiveData] = (0, import_react3.useState)(null);
+  const handleDragStart = (event) => {
+    setActiveData(event.active.data.current);
+  };
   const handleDragEnd = (event) => {
+    setActiveData(null);
     const { active, over } = event;
     if (!over) return;
     if (active.data.current?.isTemplate) {
@@ -339,10 +390,15 @@ function FormBuilder() {
       }
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_core3.DndContext, { collisionDetection: import_core3.closestCenter, onDragEnd: handleDragEnd, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex h-full w-full bg-slate-50 text-slate-900 overflow-hidden", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_core3.DndContext, { collisionDetection: import_core3.closestCenter, onDragStart: handleDragStart, onDragEnd: handleDragEnd, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex h-full w-full bg-slate-50 text-slate-900 overflow-hidden", children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Sidebar, {}),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Canvas, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(PropertyPanel, {})
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(PropertyPanel, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_core3.DragOverlay, { children: [
+      activeData?.isTemplate ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "p-3 bg-white border-2 border-blue-500 rounded shadow-lg flex items-center gap-3 opacity-90 cursor-grabbing", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-sm font-medium", children: activeData.label }) }) : null,
+      activeData?.isElement ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "p-4 bg-white border-2 border-blue-500 rounded shadow-lg opacity-90 cursor-grabbing", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "pointer-events-none", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_pdyform_react3.DynamicForm, { schema: { elements: [activeData.element] }, onSubmit: () => {
+      }, hideSubmitButton: true }) }) }) : null
+    ] })
   ] }) });
 }
 // Annotate the CommonJS export names for ESM import in node:
