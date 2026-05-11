@@ -1,0 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './Select';
+const SelectRenderer = ({ field, value, onChange, onBlur, fieldId }) => (_jsxs(Select, { value: value != null ? String(value) : '', onValueChange: onChange, disabled: typeof field.disabled === 'boolean' ? field.disabled : undefined, name: field.name, ...field.componentProps, children: [_jsx(SelectTrigger, { id: fieldId, onBlur: onBlur, children: _jsx(SelectValue, { placeholder: field.placeholder || 'Select an option' }) }), _jsx(SelectContent, { children: _jsx(SelectGroup, { children: field.options?.map((opt) => (_jsx(SelectItem, { value: String(opt.value), children: opt.label }, opt.value))) }) })] }));
+export default SelectRenderer;

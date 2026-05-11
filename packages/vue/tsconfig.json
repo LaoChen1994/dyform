@@ -1,7 +1,8 @@
 {
   "extends": "@vue/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "composite": false,
+    "composite": true,
+    "declarationMap": true,
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -12,5 +13,8 @@
     "declaration": true
   },
   "include": ["src/**/*.ts", "src/**/*.vue"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "references": [
+    { "path": "../core" }
+  ]
 }

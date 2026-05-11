@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { DynamicForm } from 'pdyform/vue';
-import type { FormSchema } from 'pdyform/core';
+import { DynamicForm } from 'pdyform-vue';
+import type { FormSchema } from 'pdyform-core';
 import { defaultSchema } from '../../shared/defaultSchema';
 
 const schemaText = ref(JSON.stringify(defaultSchema, null, 2));

@@ -10,9 +10,10 @@ interface DynamicFormProps {
   className?: string;
   form?: UseFormReturn;
   componentMap?: FieldComponentMap;
+  hideSubmitButton?: boolean;
 }
 
-export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, className, form: externalForm, componentMap }) => {
+export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, className, form: externalForm, componentMap, hideSubmitButton }) => {
   const internalForm = useForm({ schema });
   const form = externalForm || internalForm;
   const { engine } = form;
@@ -68,13 +69,15 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, clas
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting || isAnyFieldValidating}
-        className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
-      >
-        {isSubmitting ? 'Submitting...' : (isAnyFieldValidating ? 'Validating...' : (schema.submitButtonText || 'Submit'))}
-      </button>
+      {!hideSubmitButton && (
+        <button
+          type="submit"
+          disabled={isSubmitting || isAnyFieldValidating}
+          className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+        >
+          {isSubmitting ? 'Submitting...' : (isAnyFieldValidating ? 'Validating...' : (schema.submitButtonText || 'Submit'))}
+        </button>
+      )}
     </form>
   );
 };

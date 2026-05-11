@@ -15,7 +15,7 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       external: [
         'vue',
-        'pdyform/core',
+        'pdyform-core',
         'radix-vue',
         'lucide-vue-next',
         'class-variance-authority',
@@ -25,7 +25,7 @@ export default defineConfig(({ command }) => ({
       output: {
         globals: {
           vue: 'Vue',
-          'pdyform/core': 'PdyformCore',
+          'pdyform-core': 'PdyformCore',
           'radix-vue': 'radixVue',
           'lucide-vue-next': 'lucideVueNext',
           'class-variance-authority': 'classVarianceAuthority',
@@ -40,7 +40,7 @@ export default defineConfig(({ command }) => ({
     // so Rollup can treat pdyform/core as external.
     alias: command === 'serve'
       ? {
-          'pdyform/core': path.resolve(__dirname, '../core/src'),
+          'pdyform-core': path.resolve(__dirname, '../core/src'),
         }
       : {},
   },

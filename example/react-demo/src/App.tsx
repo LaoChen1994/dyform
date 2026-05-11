@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { DynamicForm } from 'pdyform/react';
-import type { FormSchema } from 'pdyform/core';
+import { DynamicForm } from 'pdyform-react';
+import type { FormSchema } from 'pdyform-core';
 import { defaultSchema } from '../../shared/defaultSchema';
 
 const prettyJSON = (value: unknown): string => JSON.stringify(value, null, 2);

@@ -110,6 +110,7 @@ interface DynamicFormProps {
     className?: string;
     form?: UseFormReturn;
     componentMap?: FieldComponentMap;
+    hideSubmitButton?: boolean;
 }
 declare const DynamicForm: React__default.FC<DynamicFormProps>;
 

@@ -1,4 +1,4 @@
-import type { FormSchema } from 'pdyform/core';
+import type { FormSchema } from 'pdyform-core';
 
 export const defaultSchema: FormSchema = {
   title: 'Comprehensive Registration Form',

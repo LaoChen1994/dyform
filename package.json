@@ -1,8 +1,6 @@
 {
-  "name": "pdyform",
-  "publishConfig": {
-    "access": "public"
-  },
+  "name": "pdyform-monorepo",
+  "private": true,
   "description": "A high-performance, schema-driven dynamic form system with React and Vue support.",
   "keywords": [
     "dynamic-form",
@@ -12,50 +10,6 @@
     "json-schema",
     "form-builder"
   ],
-  "files": [
-    "README.md",
-    "packages/core/dist/**",
-    "packages/react/dist/**",
-    "packages/vue/dist/**"
-  ],
-  "main": "./packages/core/dist/index.cjs",
-  "module": "./packages/core/dist/index.js",
-  "types": "./packages/core/dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "core": [
-        "./packages/core/dist/index.d.ts"
-      ],
-      "react": [
-        "./packages/react/dist/index.d.ts"
-      ],
-      "vue": [
-        "./packages/vue/dist/index.d.ts"
-      ]
-    }
-  },
-  "exports": {
-    ".": {
-      "types": "./packages/core/dist/index.d.ts",
-      "import": "./packages/core/dist/index.js",
-      "require": "./packages/core/dist/index.cjs"
-    },
-    "./core": {
-      "types": "./packages/core/dist/index.d.ts",
-      "import": "./packages/core/dist/index.js",
-      "require": "./packages/core/dist/index.cjs"
-    },
-    "./react": {
-      "types": "./packages/react/dist/index.d.ts",
-      "import": "./packages/react/dist/index.js",
-      "require": "./packages/react/dist/index.cjs"
-    },
-    "./vue": {
-      "types": "./packages/vue/dist/index.d.ts",
-      "import": "./packages/vue/dist/index.mjs",
-      "require": "./packages/vue/dist/index.js"
-    }
-  },
   "scripts": {
     "build:all": "turbo run build",
     "dev:all": "turbo run dev",
