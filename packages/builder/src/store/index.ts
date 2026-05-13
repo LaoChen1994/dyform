@@ -39,13 +39,14 @@ export const useBuilderStore: UseBoundStore<StoreApi<BuilderState>> = create<Bui
       set((state) => {
         const updateNode = (elements: FormElement[]) => {
           for (let i = 0; i < elements.length; i++) {
-            if (elements[i].id === id) {
-              Object.assign(elements[i], updates);
+            const el = elements[i];
+            if (el.id === id) {
+              Object.assign(el, updates);
               return true;
             }
-            if (elements[i].nodeType === 'group' || elements[i].nodeType === 'grid') {
-              if (elements[i].elements) {
-                if (updateNode(elements[i].elements!)) {
+            if (el.nodeType === 'group' || el.nodeType === 'grid') {
+              if (el.elements) {
+                if (updateNode(el.elements)) {
                   return true;
                 }
               }
@@ -61,13 +62,14 @@ export const useBuilderStore: UseBoundStore<StoreApi<BuilderState>> = create<Bui
       set((state) => {
         const removeNode = (elements: FormElement[]) => {
           for (let i = 0; i < elements.length; i++) {
-            if (elements[i].id === id) {
+            const el = elements[i];
+            if (el.id === id) {
               elements.splice(i, 1);
               return true;
             }
-            if (elements[i].nodeType === 'group' || elements[i].nodeType === 'grid') {
-              if (elements[i].elements) {
-                if (removeNode(elements[i].elements!)) {
+            if (el.nodeType === 'group' || el.nodeType === 'grid') {
+              if (el.elements) {
+                if (removeNode(el.elements)) {
                   return true;
                 }
               }

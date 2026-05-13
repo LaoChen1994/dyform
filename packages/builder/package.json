@@ -4,6 +4,15 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LaoChen1994/pdyform",
+    "directory": "packages/builder"
+  },
+  "bugs": {
+    "url": "https://github.com/LaoChen1994/pdyform/issues"
+  },
+  "homepage": "https://github.com/LaoChen1994/pdyform/tree/main/packages/builder#readme",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
