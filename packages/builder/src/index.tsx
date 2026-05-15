@@ -1,10 +1,24 @@
-import React from 'react';
-import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
+import React, { useState } from 'react';
+import { DndContext, DragEndEvent, DragStartEvent, closestCenter, DragOverlay } from '@dnd-kit/core';
 import { useBuilderStore } from './store';
 import { Sidebar } from './components/Sidebar';
 import { Canvas } from './components/Canvas';
 import { PropertyPanel } from './components/PropertyPanel';
-import type { FormField } from 'pdyform-core';
+import { DynamicForm } from 'pdyform-react';
+import type { FieldType, FormElement, FormField } from 'pdyform-core';
+
+type TemplateDragData = {
+  isTemplate: true;
+  type: FieldType;
+  label: string;
+};
+
+type ElementDragData = {
+  isElement: true;
+  element: FormElement;
+};
+
+type ActiveDragData = TemplateDragData | ElementDragData;
 
 export function FormBuilder() {
   const schema = useBuilderStore((s) => s.schema);
@@ -13,7 +27,32 @@ export function FormBuilder() {
   const moveElement = useBuilderStore((s) => s.moveElement);
   const selectElement = useBuilderStore((s) => s.selectElement);
 
+  const [activeData, setActiveData] = useState<ActiveDragData | null>(null);
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const current = event.active.data.current;
+    if (current?.isTemplate) {
+      setActiveData({
+        isTemplate: true,
+        type: current.type,
+        label: current.label,
+      });
+      return;
+    }
+
+    if (current?.isElement) {
+      setActiveData({
+        isElement: true,
+        element: current.element,
+      });
+      return;
+    }
+
+    setActiveData(null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveData(null);
     const { active, over } = event;
     if (!over) return;
 
@@ -42,11 +81,26 @@ export function FormBuilder() {
   };
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex h-full w-full bg-slate-50 text-slate-900 overflow-hidden">
         <Sidebar />
         <Canvas />
         <PropertyPanel />
+        
+        <DragOverlay>
+          {activeData && 'isTemplate' in activeData ? (
+            <div className="p-3 bg-white border-2 border-blue-500 rounded shadow-lg flex items-center gap-3 opacity-90 cursor-grabbing">
+              <span className="text-sm font-medium">{activeData.label}</span>
+            </div>
+          ) : null}
+          {activeData && 'isElement' in activeData ? (
+            <div className="p-4 bg-white border-2 border-blue-500 rounded shadow-lg opacity-90 cursor-grabbing">
+              <div className="pointer-events-none">
+                <DynamicForm schema={{ elements: [activeData.element] }} onSubmit={() => {}} hideSubmitButton />
+              </div>
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
     </DndContext>
   );

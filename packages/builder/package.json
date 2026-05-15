@@ -4,14 +4,23 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LaoChen1994/pdyform",
+    "directory": "packages/builder"
+  },
+  "bugs": {
+    "url": "https://github.com/LaoChen1994/pdyform/issues"
+  },
+  "homepage": "https://github.com/LaoChen1994/pdyform/tree/main/packages/builder#readme",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -29,6 +38,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "immer": "^11.1.8",
     "lucide-react": "^0.300.0",
     "pdyform-core": "workspace:*",
     "pdyform-react": "workspace:*",
@@ -40,8 +50,8 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@types/react": "^18.3.28",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "@types/react": "^18.3.28"
+    "typescript": "^5.0.0"
   }
 }

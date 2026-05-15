@@ -1,70 +1,83 @@
 // src/index.tsx
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import { useState } from "react";
+import { DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
 
 // src/store/index.ts
 import { create } from "zustand";
-var useBuilderStore = create((set) => ({
-  schema: {
-    title: "New Form",
-    elements: []
-  },
-  selectedElementId: null,
-  setSchema: (schema) => set({ schema }),
-  selectElement: (id) => set({ selectedElementId: id }),
-  addElement: (element) => set((state) => ({
+import { immer } from "zustand/middleware/immer";
+var useBuilderStore = create()(
+  immer((set) => ({
     schema: {
-      ...state.schema,
-      elements: [...state.schema.elements || [], element]
-    }
-  })),
-  updateElement: (id, updates) => set((state) => {
-    const updateNode = (elements) => {
-      return elements.map((el) => {
-        if (el.id === id) {
-          return { ...el, ...updates };
-        }
-        if (el.nodeType === "group" || el.nodeType === "grid") {
-          return { ...el, elements: updateNode(el.elements) };
-        }
-        return el;
-      });
-    };
-    return {
-      schema: {
-        ...state.schema,
-        elements: updateNode(state.schema.elements || [])
+      title: "New Form",
+      elements: []
+    },
+    selectedElementId: null,
+    setSchema: (schema) => set((state) => {
+      state.schema = schema;
+    }),
+    selectElement: (id) => set((state) => {
+      state.selectedElementId = id;
+    }),
+    addElement: (element) => set((state) => {
+      if (!state.schema.elements) {
+        state.schema.elements = [];
       }
-    };
-  }),
-  removeElement: (id) => set((state) => {
-    const removeNode = (elements) => {
-      return elements.filter((el) => el.id !== id).map((el) => {
-        if (el.nodeType === "group" || el.nodeType === "grid") {
-          return { ...el, elements: removeNode(el.elements) };
+      state.schema.elements.push(element);
+    }),
+    updateElement: (id, updates) => set((state) => {
+      const updateNode = (elements) => {
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          if (el.id === id) {
+            Object.assign(el, updates);
+            return true;
+          }
+          if (el.nodeType === "group" || el.nodeType === "grid") {
+            if (el.elements) {
+              if (updateNode(el.elements)) {
+                return true;
+              }
+            }
+          }
         }
-        return el;
-      });
-    };
-    return {
-      schema: {
-        ...state.schema,
-        elements: removeNode(state.schema.elements || [])
-      },
-      selectedElementId: state.selectedElementId === id ? null : state.selectedElementId
-    };
-  }),
-  moveElement: (fromIndex, toIndex) => set((state) => {
-    const elements = [...state.schema.elements || []];
-    const [moved] = elements.splice(fromIndex, 1);
-    elements.splice(toIndex, 0, moved);
-    return {
-      schema: {
-        ...state.schema,
-        elements
+        return false;
+      };
+      if (state.schema.elements) {
+        updateNode(state.schema.elements);
       }
-    };
-  })
-}));
+    }),
+    removeElement: (id) => set((state) => {
+      const removeNode = (elements) => {
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          if (el.id === id) {
+            elements.splice(i, 1);
+            return true;
+          }
+          if (el.nodeType === "group" || el.nodeType === "grid") {
+            if (el.elements) {
+              if (removeNode(el.elements)) {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      };
+      if (state.schema.elements) {
+        removeNode(state.schema.elements);
+      }
+      if (state.selectedElementId === id) {
+        state.selectedElementId = null;
+      }
+    }),
+    moveElement: (fromIndex, toIndex) => set((state) => {
+      if (!state.schema.elements) return;
+      const [moved] = state.schema.elements.splice(fromIndex, 1);
+      state.schema.elements.splice(toIndex, 0, moved);
+    })
+  }))
+);
 
 // src/components/Sidebar.tsx
 import { useDraggable } from "@dnd-kit/core";
@@ -104,6 +117,7 @@ function Sidebar() {
 }
 
 // src/components/Canvas.tsx
+import React from "react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -113,7 +127,11 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { DynamicForm } from "pdyform-react";
 import { jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
-function SortableFieldWrapper({ element }) {
+var SortableFieldWrapper = React.memo(({
+  element,
+  isSelected,
+  onSelect
+}) => {
   const {
     attributes,
     listeners,
@@ -121,14 +139,17 @@ function SortableFieldWrapper({ element }) {
     transform,
     transition,
     isDragging
-  } = useSortable({ id: element.id });
-  const selectElement = useBuilderStore((s) => s.selectElement);
-  const selectedElementId = useBuilderStore((s) => s.selectedElementId);
+  } = useSortable({
+    id: element.id,
+    data: {
+      isElement: true,
+      element
+    }
+  });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition
   };
-  const isSelected = selectedElementId === element.id;
   return /* @__PURE__ */ jsxs2(
     "div",
     {
@@ -136,7 +157,7 @@ function SortableFieldWrapper({ element }) {
       style,
       onClick: (e) => {
         e.stopPropagation();
-        selectElement(element.id);
+        onSelect(element.id);
       },
       className: `relative p-4 mb-2 rounded border-2 transition-colors cursor-pointer bg-white ${isSelected ? "border-blue-500 bg-blue-50/10" : "border-transparent hover:border-slate-200 hover:bg-slate-50"} ${isDragging ? "opacity-30" : ""}`,
       children: [
@@ -154,11 +175,12 @@ function SortableFieldWrapper({ element }) {
       ]
     }
   );
-}
+});
 function Canvas() {
   const schema = useBuilderStore((s) => s.schema);
   const elements = schema.elements || [];
   const selectElement = useBuilderStore((s) => s.selectElement);
+  const selectedElementId = useBuilderStore((s) => s.selectedElementId);
   const { setNodeRef, isOver } = useDroppable({
     id: "canvas-droppable"
   });
@@ -180,7 +202,15 @@ function Canvas() {
               {
                 items: elements.map((e) => e.id),
                 strategy: verticalListSortingStrategy,
-                children: elements.map((element) => /* @__PURE__ */ jsx2(SortableFieldWrapper, { element }, element.id))
+                children: elements.map((element) => /* @__PURE__ */ jsx2(
+                  SortableFieldWrapper,
+                  {
+                    element,
+                    isSelected: selectedElementId === element.id,
+                    onSelect: selectElement
+                  },
+                  element.id
+                ))
               }
             )
           ]
@@ -200,7 +230,9 @@ function PropertyPanel() {
   const selectedElementId = useBuilderStore((s) => s.selectedElementId);
   const updateElement = useBuilderStore((s) => s.updateElement);
   const removeElement = useBuilderStore((s) => s.removeElement);
-  const selectedElement = elements.find((e) => e.id === selectedElementId);
+  const selectedElement = elements.find(
+    (element) => element.id === selectedElementId && element.nodeType !== "group" && element.nodeType !== "grid"
+  );
   const propertySchema = useMemo(() => {
     if (!selectedElement) return { elements: [] };
     return {
@@ -233,7 +265,7 @@ function PropertyPanel() {
           name: "required",
           label: "\u662F\u5426\u5FC5\u586B",
           type: "switch",
-          defaultValue: !!selectedElement.validations?.find((v) => v.type === "required")
+          defaultValue: !!selectedElement.validations?.find((validation) => validation.type === "required")
         }
       ]
     };
@@ -241,24 +273,36 @@ function PropertyPanel() {
   const form = useForm({ schema: propertySchema });
   useEffect(() => {
     if (!selectedElement) return;
+    let timer;
     const unsubscribe = form.engine.store.subscribe(() => {
-      const state = form.engine.store.getState();
-      const currentVals = state.values;
-      if (currentVals && Object.keys(currentVals).length > 0) {
-        const updates = {
-          label: currentVals.label,
-          name: currentVals.name,
-          placeholder: currentVals.placeholder
-        };
-        if (currentVals.required) {
-          updates.validations = [{ type: "required" }];
-        } else {
-          updates.validations = [];
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const state = form.engine.store.getState();
+        const currentVals = state.values;
+        if (currentVals && Object.keys(currentVals).length > 0) {
+          const updates = {};
+          if (typeof currentVals.label === "string") {
+            updates.label = currentVals.label;
+          }
+          if (typeof currentVals.name === "string") {
+            updates.name = currentVals.name;
+          }
+          if (typeof currentVals.placeholder === "string") {
+            updates.placeholder = currentVals.placeholder;
+          }
+          if (currentVals.required) {
+            updates.validations = [{ type: "required" }];
+          } else {
+            updates.validations = [];
+          }
+          updateElement(selectedElement.id, updates);
         }
-        updateElement(selectedElement.id, updates);
-      }
+      }, 300);
     });
-    return unsubscribe;
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, [form.engine.store, selectedElement?.id, updateElement]);
   if (!selectedElement) {
     return /* @__PURE__ */ jsx3("div", { className: "w-80 border-l border-slate-200 bg-slate-50 p-4 text-slate-400 text-sm text-center pt-20", children: "\u8BF7\u5148\u5728\u753B\u5E03\u4E2D\u9009\u4E2D\u4E00\u4E2A\u7EC4\u4EF6" });
@@ -289,6 +333,7 @@ function PropertyPanel() {
 }
 
 // src/index.tsx
+import { DynamicForm as DynamicForm3 } from "pdyform-react";
 import { jsx as jsx4, jsxs as jsxs4 } from "react/jsx-runtime";
 function FormBuilder() {
   const schema = useBuilderStore((s) => s.schema);
@@ -296,7 +341,28 @@ function FormBuilder() {
   const addElement = useBuilderStore((s) => s.addElement);
   const moveElement = useBuilderStore((s) => s.moveElement);
   const selectElement = useBuilderStore((s) => s.selectElement);
+  const [activeData, setActiveData] = useState(null);
+  const handleDragStart = (event) => {
+    const current = event.active.data.current;
+    if (current?.isTemplate) {
+      setActiveData({
+        isTemplate: true,
+        type: current.type,
+        label: current.label
+      });
+      return;
+    }
+    if (current?.isElement) {
+      setActiveData({
+        isElement: true,
+        element: current.element
+      });
+      return;
+    }
+    setActiveData(null);
+  };
   const handleDragEnd = (event) => {
+    setActiveData(null);
     const { active, over } = event;
     if (!over) return;
     if (active.data.current?.isTemplate) {
@@ -319,10 +385,15 @@ function FormBuilder() {
       }
     }
   };
-  return /* @__PURE__ */ jsx4(DndContext, { collisionDetection: closestCenter, onDragEnd: handleDragEnd, children: /* @__PURE__ */ jsxs4("div", { className: "flex h-full w-full bg-slate-50 text-slate-900 overflow-hidden", children: [
+  return /* @__PURE__ */ jsx4(DndContext, { collisionDetection: closestCenter, onDragStart: handleDragStart, onDragEnd: handleDragEnd, children: /* @__PURE__ */ jsxs4("div", { className: "flex h-full w-full bg-slate-50 text-slate-900 overflow-hidden", children: [
     /* @__PURE__ */ jsx4(Sidebar, {}),
     /* @__PURE__ */ jsx4(Canvas, {}),
-    /* @__PURE__ */ jsx4(PropertyPanel, {})
+    /* @__PURE__ */ jsx4(PropertyPanel, {}),
+    /* @__PURE__ */ jsxs4(DragOverlay, { children: [
+      activeData && "isTemplate" in activeData ? /* @__PURE__ */ jsx4("div", { className: "p-3 bg-white border-2 border-blue-500 rounded shadow-lg flex items-center gap-3 opacity-90 cursor-grabbing", children: /* @__PURE__ */ jsx4("span", { className: "text-sm font-medium", children: activeData.label }) }) : null,
+      activeData && "isElement" in activeData ? /* @__PURE__ */ jsx4("div", { className: "p-4 bg-white border-2 border-blue-500 rounded shadow-lg opacity-90 cursor-grabbing", children: /* @__PURE__ */ jsx4("div", { className: "pointer-events-none", children: /* @__PURE__ */ jsx4(DynamicForm3, { schema: { elements: [activeData.element] }, onSubmit: () => {
+      }, hideSubmitButton: true }) }) }) : null
+    ] })
   ] }) });
 }
 export {

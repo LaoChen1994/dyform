@@ -10,7 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'pdyform/core': path.resolve(__dirname, '../core/src'),
+      'pdyform-core': path.resolve(__dirname, '../core/src'),
     },
   },
 });

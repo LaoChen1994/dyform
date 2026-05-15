@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import FormFieldRenderer from '../src/FormFieldRenderer.vue';
-import type { FormField } from 'pdyform/core';
+import type { FormField } from 'pdyform-core';
 
 describe('FormFieldRenderer', () => {
   const defaultField: FormField = {
