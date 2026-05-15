@@ -50,14 +50,9 @@ import { FormBuilder } from 'pdyform-builder';
 // import 'pdyform-builder/dist/index.css'; 
 
 export default function App() {
-  const handleSave = (schema) => {
-    console.log('Form Schema saved:', schema);
-    // You can now save this JSON schema to your database
-  };
-
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
-      <FormBuilder onSave={handleSave} />
+      <FormBuilder />
     </div>
   );
 }

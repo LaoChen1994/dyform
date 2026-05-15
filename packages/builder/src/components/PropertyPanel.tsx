@@ -10,7 +10,10 @@ export function PropertyPanel() {
   const updateElement = useBuilderStore((s) => s.updateElement);
   const removeElement = useBuilderStore((s) => s.removeElement);
 
-  const selectedElement = elements.find((e) => e.id === selectedElementId) as FormField | undefined;
+  const selectedElement = elements.find(
+    (element): element is FormField =>
+      element.id === selectedElementId && element.nodeType !== 'group' && element.nodeType !== 'grid'
+  );
 
   const propertySchema = useMemo<FormSchema>(() => {
     if (!selectedElement) return { elements: [] };
@@ -37,14 +40,14 @@ export function PropertyPanel() {
           name: 'placeholder',
           label: '占位提示',
           type: 'text',
-          defaultValue: (selectedElement as any).placeholder,
+          defaultValue: selectedElement.placeholder,
         },
         {
           id: 'required',
           name: 'required',
           label: '是否必填',
           type: 'switch',
-          defaultValue: !!(selectedElement as any).validations?.find((v: any) => v.type === 'required'),
+          defaultValue: !!selectedElement.validations?.find((validation) => validation.type === 'required'),
         }
       ],
     };
@@ -63,11 +66,16 @@ export function PropertyPanel() {
         const state = form.engine.store.getState();
         const currentVals = state.values;
         if (currentVals && Object.keys(currentVals).length > 0) {
-          const updates: any = {
-            label: currentVals.label,
-            name: currentVals.name,
-            placeholder: currentVals.placeholder,
-          };
+          const updates: Partial<FormField> = {};
+          if (typeof currentVals.label === 'string') {
+            updates.label = currentVals.label;
+          }
+          if (typeof currentVals.name === 'string') {
+            updates.name = currentVals.name;
+          }
+          if (typeof currentVals.placeholder === 'string') {
+            updates.placeholder = currentVals.placeholder;
+          }
           
           if (currentVals.required) {
              updates.validations = [{ type: 'required' }];

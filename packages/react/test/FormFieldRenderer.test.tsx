@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FormFieldRenderer } from '../src/FormFieldRenderer';
 import React from 'react';
-import type { FormField } from 'pdyform/core';
+import type { FormField } from 'pdyform-core';
 
 describe('FormFieldRenderer', () => {
   const defaultField: FormField = {

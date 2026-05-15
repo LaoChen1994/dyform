@@ -37,7 +37,7 @@ export default defineConfig(({ command }) => ({
   },
   resolve: {
     // Use source alias in local dev for faster iteration, avoid alias during build
-    // so Rollup can treat pdyform/core as external.
+    // so Rollup can treat pdyform-core as external.
     alias: command === 'serve'
       ? {
           'pdyform-core': path.resolve(__dirname, '../core/src'),

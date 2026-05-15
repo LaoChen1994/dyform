@@ -61,13 +61,14 @@ var useBuilderStore = (0, import_zustand.create)()(
     updateElement: (id, updates) => set((state) => {
       const updateNode = (elements) => {
         for (let i = 0; i < elements.length; i++) {
-          if (elements[i].id === id) {
-            Object.assign(elements[i], updates);
+          const el = elements[i];
+          if (el.id === id) {
+            Object.assign(el, updates);
             return true;
           }
-          if (elements[i].nodeType === "group" || elements[i].nodeType === "grid") {
-            if (elements[i].elements) {
-              if (updateNode(elements[i].elements)) {
+          if (el.nodeType === "group" || el.nodeType === "grid") {
+            if (el.elements) {
+              if (updateNode(el.elements)) {
                 return true;
               }
             }
@@ -82,13 +83,14 @@ var useBuilderStore = (0, import_zustand.create)()(
     removeElement: (id) => set((state) => {
       const removeNode = (elements) => {
         for (let i = 0; i < elements.length; i++) {
-          if (elements[i].id === id) {
+          const el = elements[i];
+          if (el.id === id) {
             elements.splice(i, 1);
             return true;
           }
-          if (elements[i].nodeType === "group" || elements[i].nodeType === "grid") {
-            if (elements[i].elements) {
-              if (removeNode(elements[i].elements)) {
+          if (el.nodeType === "group" || el.nodeType === "grid") {
+            if (el.elements) {
+              if (removeNode(el.elements)) {
                 return true;
               }
             }
@@ -258,7 +260,9 @@ function PropertyPanel() {
   const selectedElementId = useBuilderStore((s) => s.selectedElementId);
   const updateElement = useBuilderStore((s) => s.updateElement);
   const removeElement = useBuilderStore((s) => s.removeElement);
-  const selectedElement = elements.find((e) => e.id === selectedElementId);
+  const selectedElement = elements.find(
+    (element) => element.id === selectedElementId && element.nodeType !== "group" && element.nodeType !== "grid"
+  );
   const propertySchema = (0, import_react2.useMemo)(() => {
     if (!selectedElement) return { elements: [] };
     return {
@@ -291,7 +295,7 @@ function PropertyPanel() {
           name: "required",
           label: "\u662F\u5426\u5FC5\u586B",
           type: "switch",
-          defaultValue: !!selectedElement.validations?.find((v) => v.type === "required")
+          defaultValue: !!selectedElement.validations?.find((validation) => validation.type === "required")
         }
       ]
     };
@@ -306,11 +310,16 @@ function PropertyPanel() {
         const state = form.engine.store.getState();
         const currentVals = state.values;
         if (currentVals && Object.keys(currentVals).length > 0) {
-          const updates = {
-            label: currentVals.label,
-            name: currentVals.name,
-            placeholder: currentVals.placeholder
-          };
+          const updates = {};
+          if (typeof currentVals.label === "string") {
+            updates.label = currentVals.label;
+          }
+          if (typeof currentVals.name === "string") {
+            updates.name = currentVals.name;
+          }
+          if (typeof currentVals.placeholder === "string") {
+            updates.placeholder = currentVals.placeholder;
+          }
           if (currentVals.required) {
             updates.validations = [{ type: "required" }];
           } else {
@@ -364,7 +373,23 @@ function FormBuilder() {
   const selectElement = useBuilderStore((s) => s.selectElement);
   const [activeData, setActiveData] = (0, import_react3.useState)(null);
   const handleDragStart = (event) => {
-    setActiveData(event.active.data.current);
+    const current = event.active.data.current;
+    if (current?.isTemplate) {
+      setActiveData({
+        isTemplate: true,
+        type: current.type,
+        label: current.label
+      });
+      return;
+    }
+    if (current?.isElement) {
+      setActiveData({
+        isElement: true,
+        element: current.element
+      });
+      return;
+    }
+    setActiveData(null);
   };
   const handleDragEnd = (event) => {
     setActiveData(null);
@@ -395,8 +420,8 @@ function FormBuilder() {
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Canvas, {}),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(PropertyPanel, {}),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_core3.DragOverlay, { children: [
-      activeData?.isTemplate ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "p-3 bg-white border-2 border-blue-500 rounded shadow-lg flex items-center gap-3 opacity-90 cursor-grabbing", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-sm font-medium", children: activeData.label }) }) : null,
-      activeData?.isElement ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "p-4 bg-white border-2 border-blue-500 rounded shadow-lg opacity-90 cursor-grabbing", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "pointer-events-none", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_pdyform_react3.DynamicForm, { schema: { elements: [activeData.element] }, onSubmit: () => {
+      activeData && "isTemplate" in activeData ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "p-3 bg-white border-2 border-blue-500 rounded shadow-lg flex items-center gap-3 opacity-90 cursor-grabbing", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-sm font-medium", children: activeData.label }) }) : null,
+      activeData && "isElement" in activeData ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "p-4 bg-white border-2 border-blue-500 rounded shadow-lg opacity-90 cursor-grabbing", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "pointer-events-none", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_pdyform_react3.DynamicForm, { schema: { elements: [activeData.element] }, onSubmit: () => {
       }, hideSubmitButton: true }) }) }) : null
     ] })
   ] }) });
