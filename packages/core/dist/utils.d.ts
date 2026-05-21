@@ -18,5 +18,6 @@ declare function validateFieldByName(fields: FormField[], name: string, value: u
 declare function validateForm(fields: FormField[], values: Record<string, unknown>, resolver?: FormResolver, customMessages?: ErrorMessageTemplates): Promise<Record<string, string>>;
 declare function getDefaultValues(fields: FormField[]): Record<string, unknown>;
 declare function flattenElements(elements?: FormElement[]): FormField[];
+declare function flattenElementsWithValues(elements: FormElement[], values: Record<string, unknown>, parentPath?: string): FormField[];
 
-export { defaultErrorMessages, flattenElements, get, getDefaultValues, normalizeFieldValue, set, validateField, validateFieldByName, validateForm };
+export { defaultErrorMessages, flattenElements, flattenElementsWithValues, get, getDefaultValues, normalizeFieldValue, set, validateField, validateFieldByName, validateForm };

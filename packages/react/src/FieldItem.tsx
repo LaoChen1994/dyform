@@ -12,13 +12,13 @@ export interface FieldItemProps {
 
 export const FieldItem: React.FC<FieldItemProps> = memo(({ field, form, componentMap }) => {
   const { engine, useFieldState } = form;
-  const { value, error, touched, isValidating, values, fieldProps } = useFieldState(field.name);
+  const { value, error, touched, isValidating, fieldProps, computedState } = useFieldState(field.name);
 
   // Merge static schema field definition with any runtime overrides
   const mergedField = { ...field, ...fieldProps };
 
-  const isHidden = typeof mergedField.hidden === 'function' ? mergedField.hidden(values) : mergedField.hidden;
-  const isDisabled = typeof mergedField.disabled === 'function' ? mergedField.disabled(values) : mergedField.disabled;
+  const isHidden = computedState?.hidden ?? false;
+  const isDisabled = computedState?.disabled ?? false;
 
   if (isHidden) {
     return null;
@@ -28,7 +28,7 @@ export const FieldItem: React.FC<FieldItemProps> = memo(({ field, form, componen
 
   return (
     <FormFieldRenderer
-      field={{ ...field, disabled: isDisabled || isValidating }}
+      field={{ ...mergedField, disabled: isDisabled || isValidating }}
       value={value}
       onChange={(val) => engine.setFieldValue(field.name, val)}
       onBlur={() => engine.setFieldBlur(field.name)}

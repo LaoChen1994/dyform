@@ -1,4 +1,6 @@
 export type FieldType = 'text' | 'number' | 'email' | 'password' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'date' | 'switch' | (string & {});
+export type ValidateOn = 'change' | 'blur' | 'submit' | 'change-blur';
+export type HiddenFieldStrategy = 'keep' | 'omit' | 'clear';
 
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'pattern' | 'email' | 'custom';
@@ -29,6 +31,7 @@ export interface FormField {
   componentProps?: Record<string, any>; // Extra props for the underlying component
   layout?: 'vertical' | 'horizontal' | 'none'; // How the label is aligned
   dependencies?: string[]; // Fields that trigger this field's validation/re-evaluation
+  validateOn?: ValidateOn;
 }
 
 export interface FormGroup {
@@ -48,7 +51,18 @@ export interface FormGrid {
   elements: FormElement[];
 }
 
-export type FormElement = FormField | FormGroup | FormGrid;
+export interface FormList {
+  nodeType: 'list';
+  id?: string;
+  name: string;
+  title?: string;
+  description?: string;
+  className?: string;
+  elements: FormElement[];
+  defaultValue?: unknown[];
+}
+
+export type FormElement = FormField | FormGroup | FormGrid | FormList;
 
 export type FormResolver = (values: Record<string, unknown>) => Record<string, string> | Promise<Record<string, string>>;
 
@@ -69,6 +83,8 @@ export interface FormSchema {
   submitButtonText?: string;
   resolver?: FormResolver;
   errorMessages?: ErrorMessageTemplates;
+  validateOn?: ValidateOn;
+  hiddenFieldStrategy?: HiddenFieldStrategy;
   effects?: (engine: any) => void; // Uses 'any' here to avoid circular dependency, properly typed in formState.ts
 }
 

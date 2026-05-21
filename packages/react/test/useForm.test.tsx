@@ -55,5 +55,49 @@ describe('useForm Hook', () => {
     });
 
     expect(result.current.state.errors.email).toBeUndefined();
+    expect(result.current.state.values.email).toBe('');
+  });
+
+  test('reset restores schema default values', async () => {
+    const schema = {
+      fields: [
+        { id: '1', name: 'firstName', label: 'First Name', type: 'text' as const, defaultValue: 'Jane' }
+      ]
+    };
+
+    const { result } = renderHook(() => useForm({ schema }));
+
+    await act(async () => {
+      await result.current.setValue('firstName', 'John');
+    });
+
+    expect(result.current.state.values.firstName).toBe('John');
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.state.values.firstName).toBe('Jane');
+  });
+
+  test('reset keeps runtime field props', () => {
+    const schema = {
+      fields: [
+        { id: '1', name: 'firstName', label: 'First Name', type: 'text' as const }
+      ],
+      effects: (engine: any) => {
+        engine.setFieldProps('firstName', { label: 'Runtime First Name' });
+      },
+    };
+
+    const { result } = renderHook(() => useForm({ schema }));
+
+    expect(result.current.state.fieldProps.firstName?.label).toBe('Runtime First Name');
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.state.fieldProps.firstName?.label).toBe('Runtime First Name');
   });
 });

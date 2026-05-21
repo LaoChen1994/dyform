@@ -33,7 +33,13 @@ interface UseFormReturn {
         isValidating: boolean;
         values: any;
         fieldProps?: Partial<pdyform_core.FormField>;
+        computedState?: {
+            hidden: boolean;
+            disabled: boolean;
+        };
     };
+    appendListItem: (name: string, defaultVal?: unknown) => void;
+    removeListItem: (name: string, index: number) => void;
 }
 declare function useForm({ schema }: UseFormOptions): UseFormReturn;
 
@@ -107,6 +113,7 @@ declare const defaultComponentMap: FieldComponentMap;
 interface DynamicFormProps {
     schema: FormSchema;
     onSubmit: (values: Record<string, any>) => void;
+    onSubmitError?: (error: unknown) => void;
     className?: string;
     form?: UseFormReturn;
     componentMap?: FieldComponentMap;
@@ -138,6 +145,7 @@ interface FormElementRendererProps {
     elements: FormElement[];
     form: UseFormReturn;
     componentMap?: FieldComponentMap;
+    parentPath?: string;
 }
 declare const FormElementRenderer: React__default.FC<FormElementRendererProps>;
 

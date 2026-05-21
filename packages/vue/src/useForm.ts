@@ -27,16 +27,20 @@ export function useForm({ schema }: UseFormOptions) {
   };
 
   const validate = async () => {
-    const { hasError, state } = await engine.runSubmitValidation();
-    return { hasError, values: state.values };
+    const { hasError, values } = await engine.runSubmitValidation();
+    return { hasError, values };
   };
 
   const reset = () => {
-    engine.store.setState({
-      values: {},
-      errors: {},
-      isSubmitting: false,
-    });
+    engine.resetForm();
+  };
+
+  const appendListItem = (name: string, defaultVal?: unknown) => {
+    engine.appendListItem(name, defaultVal);
+  };
+
+  const removeListItem = (name: string, index: number) => {
+    engine.removeListItem(name, index);
   };
 
   return {
@@ -46,6 +50,8 @@ export function useForm({ schema }: UseFormOptions) {
     getValue,
     validate,
     reset,
+    appendListItem,
+    removeListItem,
   };
 }
 

@@ -222,3 +222,38 @@ export function flattenElements(elements?: FormElement[]): FormField[] {
   
   return fields;
 }
+
+export function flattenElementsWithValues(
+  elements: FormElement[],
+  values: Record<string, unknown>,
+  parentPath = ''
+): FormField[] {
+  if (!elements) return [];
+  const fields: FormField[] = [];
+
+  for (const el of elements) {
+    if (el.nodeType === 'group' || el.nodeType === 'grid') {
+      fields.push(...flattenElementsWithValues(el.elements, values, parentPath));
+    } else if (el.nodeType === 'list') {
+      const listName = el.name;
+      const fullListPath = parentPath ? `${parentPath}.${listName}` : listName;
+      const listValue = get(values, fullListPath);
+      if (Array.isArray(listValue)) {
+        for (let i = 0; i < listValue.length; i++) {
+          const rowPath = `${fullListPath}[${i}]`;
+          fields.push(...flattenElementsWithValues(el.elements, values, rowPath));
+        }
+      }
+    } else {
+      const field = el as FormField;
+      const fieldName = field.name;
+      const fullFieldPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
+      fields.push({
+        ...field,
+        name: fullFieldPath,
+      });
+    }
+  }
+
+  return fields;
+}
