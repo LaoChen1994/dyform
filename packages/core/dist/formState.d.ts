@@ -14,6 +14,10 @@ interface FormRuntimeState {
     validatingFields: string[];
     isSubmitting: boolean;
     fieldProps: Record<string, Partial<FormField>>;
+    computedStates: Record<string, {
+        hidden: boolean;
+        disabled: boolean;
+    }>;
 }
 type FieldChangeContext = {
     value: unknown;
@@ -27,9 +31,13 @@ interface FormEngine {
     runSubmitValidation: () => Promise<{
         state: FormRuntimeState;
         hasError: boolean;
+        values: Record<string, unknown>;
     }>;
+    resetForm: () => void;
     setFieldProps: (name: string, props: Partial<FormField>) => void;
     subscribeToChange: (name: string, listener: (context: FieldChangeContext) => void) => () => void;
+    appendListItem: (name: string, defaultVal?: unknown) => void;
+    removeListItem: (name: string, index: number) => void;
 }
 declare function createFormEngine(schemaOrFields: FormField[] | FormSchema, resolver?: FormResolver, errorMessages?: ErrorMessageTemplates): FormEngine;
 

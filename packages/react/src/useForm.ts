@@ -14,7 +14,9 @@ export interface UseFormReturn {
   validate: () => Promise<{ hasError: boolean; values: any; state: FormRuntimeState }>;
   reset: () => void;
   useWatch: (name: string) => any;
-  useFieldState: (name: string) => { value: any; error?: string; touched?: boolean; isValidating: boolean; values: any; fieldProps?: Partial<import('pdyform-core').FormField> };
+  useFieldState: (name: string) => { value: any; error?: string; touched?: boolean; isValidating: boolean; values: any; fieldProps?: Partial<import('pdyform-core').FormField>; computedState?: { hidden: boolean; disabled: boolean } };
+  appendListItem: (name: string, defaultVal?: unknown) => void;
+  removeListItem: (name: string, index: number) => void;
 }
 
 export function useForm({ schema }: UseFormOptions): UseFormReturn {
@@ -31,6 +33,8 @@ export function useForm({ schema }: UseFormOptions): UseFormReturn {
       () => get(engine.store.getState().values, name)
     );
   }, [engine]);
+
+  const DEFAULT_COMPUTED_STATE = { hidden: false, disabled: false };
 
   // To avoid useSyncExternalStore recreating object refs and causing re-renders, 
   // we do granular subscriptions for the field item.
@@ -51,13 +55,19 @@ export function useForm({ schema }: UseFormOptions): UseFormReturn {
       (listener) => engine.store.subscribe(listener),
       () => engine.store.getState().validatingFields.includes(name)
     );
-    // values is needed for disabled/hidden calculations
-    const values = useSyncExternalStore(
+    // values is returned for compatibility but obtained statically to prevent global re-renders on keystroke
+    const values = engine.store.getState().values;
+    
+    const fieldProps = useSyncExternalStore(
       (listener) => engine.store.subscribe(listener),
-      () => engine.store.getState().values
+      () => engine.store.getState().fieldProps[name]
+    );
+    const computedState = useSyncExternalStore(
+      (listener) => engine.store.subscribe(listener),
+      () => engine.store.getState().computedStates[name] || DEFAULT_COMPUTED_STATE
     );
 
-    return { value, error, touched, isValidating, values };
+    return { value, error, touched, isValidating, values, fieldProps, computedState };
   }, [engine]);
 
   const setValue = useCallback(async (name: string, value: any) => {
@@ -75,18 +85,20 @@ export function useForm({ schema }: UseFormOptions): UseFormReturn {
   }, [engine]);
 
   const validate = useCallback(async () => {
-    const { hasError, state: validatedState } = await engine.runSubmitValidation();
-    return { hasError, values: validatedState.values, state: validatedState };
+    const { hasError, state: validatedState, values } = await engine.runSubmitValidation();
+    return { hasError, values, state: validatedState };
   }, [engine]);
 
   const reset = useCallback(() => {
-    engine.store.setState({
-      values: {}, 
-      errors: {},
-      touched: {},
-      validatingFields: [],
-      isSubmitting: false,
-    });
+    engine.resetForm();
+  }, [engine]);
+
+  const appendListItem = useCallback((name: string, defaultVal?: unknown) => {
+    engine.appendListItem(name, defaultVal);
+  }, [engine]);
+
+  const removeListItem = useCallback((name: string, index: number) => {
+    engine.removeListItem(name, index);
   }, [engine]);
 
   return {
@@ -99,5 +111,7 @@ export function useForm({ schema }: UseFormOptions): UseFormReturn {
     reset,
     useWatch,
     useFieldState,
+    appendListItem,
+    removeListItem,
   };
 }

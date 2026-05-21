@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { FormSchema } from 'pdyform-core';
-import { get, flattenElements } from 'pdyform-core';
-import FormFieldRenderer from './FormFieldRenderer.vue';
+import { flattenElements } from 'pdyform-core';
+import FormElementRenderer from './FormElementRenderer.vue';
 import { useForm, type UseFormReturn } from './useForm';
 
 const props = defineProps<{
@@ -11,7 +11,7 @@ const props = defineProps<{
   form?: UseFormReturn;
 }>();
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits(['submit', 'submit-error']);
 
 const internalForm = useForm({ schema: props.schema });
 const form = props.form || internalForm;
@@ -25,34 +25,29 @@ const handleFieldBlur = async (name: string) => {
   await engine.setFieldBlur(name);
 };
 
-const isFieldHidden = (field: any) => {
-  return typeof field.hidden === 'function' ? field.hidden(formState.value.values) : !!field.hidden;
-};
-
-const getFieldWithDisabled = (field: any) => {
-  const isDisabled = typeof field.disabled === 'function' ? field.disabled(formState.value.values) : !!field.disabled;
-  const isValidating = formState.value.validatingFields.includes(field.name);
-  return { ...field, disabled: isDisabled || isValidating };
-};
-
 const handleSubmit = async () => {
-  const { hasError, values } = await form.validate();
-  
-  if (hasError) {
-    const allFields = flattenElements(props.schema.elements || props.schema.fields || []);
-    const firstErrorField = allFields.find(f => formState.value.errors[f.name]);
-    if (firstErrorField) {
-      const element = document.getElementById(`field-${firstErrorField.name}`);
-      element?.focus();
-      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  try {
+    const { hasError, values } = await form.validate();
+
+    if (hasError) {
+      const allFields = flattenElements(props.schema.elements || props.schema.fields || []);
+      const firstErrorField = allFields.find(f => formState.value.errors[f.name]);
+      if (firstErrorField) {
+        const element = document.getElementById(`field-${firstErrorField.name}`);
+        element?.focus();
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
     }
-    return;
+
+    await emit('submit', values);
+  } catch (error) {
+    emit('submit-error', error);
   }
-  
-  await emit('submit', values);
 };
 
 const isAnyFieldValidating = computed(() => formState.value.validatingFields.length > 0);
+const elements = computed(() => props.schema.elements || props.schema.fields || []);
 </script>
 
 <template>
@@ -63,16 +58,13 @@ const isAnyFieldValidating = computed(() => formState.value.validatingFields.len
     </div>
 
     <div class="space-y-4">
-      <template v-for="field in schema.fields" :key="field.id">
-        <FormFieldRenderer
-          v-if="!isFieldHidden(field)"
-          :field="getFieldWithDisabled(field)"
-          :model-value="get(formState.values, field.name)"
-          :error="formState.errors[field.name]"
-          @update:model-value="(val: any) => handleFieldChange(field.name, val)"
-          @blur="handleFieldBlur(field.name)"
-        />
-      </template>
+      <FormElementRenderer
+        :elements="elements"
+        :form-state="formState"
+        :form="form"
+        @change="handleFieldChange"
+        @blur="handleFieldBlur"
+      />
     </div>
 
     <button

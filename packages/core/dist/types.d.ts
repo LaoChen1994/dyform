@@ -1,4 +1,6 @@
 type FieldType = 'text' | 'number' | 'email' | 'password' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'date' | 'switch' | (string & {});
+type ValidateOn = 'change' | 'blur' | 'submit' | 'change-blur';
+type HiddenFieldStrategy = 'keep' | 'omit' | 'clear';
 interface ValidationRule {
     type: 'required' | 'min' | 'max' | 'pattern' | 'email' | 'custom';
     value?: unknown;
@@ -26,6 +28,7 @@ interface FormField {
     componentProps?: Record<string, any>;
     layout?: 'vertical' | 'horizontal' | 'none';
     dependencies?: string[];
+    validateOn?: ValidateOn;
 }
 interface FormGroup {
     nodeType: 'group';
@@ -42,7 +45,17 @@ interface FormGrid {
     className?: string;
     elements: FormElement[];
 }
-type FormElement = FormField | FormGroup | FormGrid;
+interface FormList {
+    nodeType: 'list';
+    id?: string;
+    name: string;
+    title?: string;
+    description?: string;
+    className?: string;
+    elements: FormElement[];
+    defaultValue?: unknown[];
+}
+type FormElement = FormField | FormGroup | FormGrid | FormList;
 type FormResolver = (values: Record<string, unknown>) => Record<string, string> | Promise<Record<string, string>>;
 type ErrorMessageTemplates = {
     required?: string;
@@ -60,6 +73,8 @@ interface FormSchema {
     submitButtonText?: string;
     resolver?: FormResolver;
     errorMessages?: ErrorMessageTemplates;
+    validateOn?: ValidateOn;
+    hiddenFieldStrategy?: HiddenFieldStrategy;
     effects?: (engine: any) => void;
 }
 interface FormState {
@@ -70,4 +85,4 @@ interface FormState {
     isValid: boolean;
 }
 
-export type { ErrorMessageTemplates, FieldType, FormElement, FormField, FormGrid, FormGroup, FormResolver, FormSchema, FormState, Option, ValidationRule };
+export type { ErrorMessageTemplates, FieldType, FormElement, FormField, FormGrid, FormGroup, FormList, FormResolver, FormSchema, FormState, HiddenFieldStrategy, Option, ValidateOn, ValidationRule };

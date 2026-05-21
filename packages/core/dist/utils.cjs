@@ -22,6 +22,7 @@ var utils_exports = {};
 __export(utils_exports, {
   defaultErrorMessages: () => defaultErrorMessages,
   flattenElements: () => flattenElements,
+  flattenElementsWithValues: () => flattenElementsWithValues,
   get: () => get,
   getDefaultValues: () => getDefaultValues,
   normalizeFieldValue: () => normalizeFieldValue,
@@ -192,10 +193,39 @@ function flattenElements(elements) {
   }
   return fields;
 }
+function flattenElementsWithValues(elements, values, parentPath = "") {
+  if (!elements) return [];
+  const fields = [];
+  for (const el of elements) {
+    if (el.nodeType === "group" || el.nodeType === "grid") {
+      fields.push(...flattenElementsWithValues(el.elements, values, parentPath));
+    } else if (el.nodeType === "list") {
+      const listName = el.name;
+      const fullListPath = parentPath ? `${parentPath}.${listName}` : listName;
+      const listValue = get(values, fullListPath);
+      if (Array.isArray(listValue)) {
+        for (let i = 0; i < listValue.length; i++) {
+          const rowPath = `${fullListPath}[${i}]`;
+          fields.push(...flattenElementsWithValues(el.elements, values, rowPath));
+        }
+      }
+    } else {
+      const field = el;
+      const fieldName = field.name;
+      const fullFieldPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
+      fields.push({
+        ...field,
+        name: fullFieldPath
+      });
+    }
+  }
+  return fields;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   defaultErrorMessages,
   flattenElements,
+  flattenElementsWithValues,
   get,
   getDefaultValues,
   normalizeFieldValue,

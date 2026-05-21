@@ -7,13 +7,14 @@ import type { FieldComponentMap } from './components';
 interface DynamicFormProps {
   schema: FormSchema;
   onSubmit: (values: Record<string, any>) => void;
+  onSubmitError?: (error: unknown) => void;
   className?: string;
   form?: UseFormReturn;
   componentMap?: FieldComponentMap;
   hideSubmitButton?: boolean;
 }
 
-export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, className, form: externalForm, componentMap, hideSubmitButton }) => {
+export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, onSubmitError, className, form: externalForm, componentMap, hideSubmitButton }) => {
   const internalForm = useForm({ schema });
   const form = externalForm || internalForm;
   const { engine } = form;
@@ -52,7 +53,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit, clas
       
       await onSubmit(values);
     } catch (error) {
-      console.error('Submission error:', error);
+      onSubmitError?.(error);
     }
   };
 

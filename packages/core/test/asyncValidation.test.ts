@@ -65,4 +65,71 @@ describe('Async Validation', () => {
     expect(result.hasError).toBe(true);
     expect(result.state.errors.asyncField).toBe('Invalid value');
   });
+
+  test('keeps latest field validation result when older async validation resolves later', async () => {
+    const fields = [
+      {
+        id: '1',
+        name: 'username',
+        label: 'Username',
+        type: 'text' as const,
+        validations: [
+          {
+            type: 'custom' as const,
+            validator: async (val: unknown) => {
+              if (val === 'admin') {
+                await new Promise(r => setTimeout(r, 30));
+                return 'Username already taken';
+              }
+              return true;
+            }
+          }
+        ]
+      }
+    ];
+
+    const engine = createFormEngine(fields);
+
+    await engine.setFieldValue('username', 'admin');
+    const staleValidation = engine.setFieldBlur('username');
+    await engine.setFieldValue('username', 'alice');
+    const latestValidation = engine.setFieldBlur('username');
+
+    await Promise.all([staleValidation, latestValidation]);
+
+    expect(engine.store.getState().errors.username).toBe('');
+    expect(engine.store.getState().validatingFields).not.toContain('username');
+  });
+
+  test('reset ignores pending async field validation results', async () => {
+    const fields = [
+      {
+        id: '1',
+        name: 'username',
+        label: 'Username',
+        type: 'text' as const,
+        validations: [
+          {
+            type: 'custom' as const,
+            validator: async () => {
+              await new Promise(r => setTimeout(r, 30));
+              return 'Username already taken';
+            }
+          }
+        ]
+      }
+    ];
+
+    const engine = createFormEngine(fields);
+
+    await engine.setFieldValue('username', 'admin');
+    const pendingValidation = engine.setFieldBlur('username');
+    engine.resetForm();
+
+    await pendingValidation;
+
+    expect(engine.store.getState().values.username).toBe('');
+    expect(engine.store.getState().errors).toEqual({});
+    expect(engine.store.getState().validatingFields).toEqual([]);
+  });
 });

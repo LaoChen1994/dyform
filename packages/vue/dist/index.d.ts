@@ -41,8 +41,10 @@ export declare const defaultComponentMap: FieldComponentMap;
 
 export declare const DynamicForm: DefineComponent<__VLS_Props, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (...args: any[]) => void;
+"submit-error": (...args: any[]) => void;
 }, string, PublicProps, Readonly<__VLS_Props> & Readonly<{
 onSubmit?: ((...args: any[]) => any) | undefined;
+"onSubmit-error"?: ((...args: any[]) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLFormElement>;
 
 export declare type FieldComponentMap = Record<string, Component>;
@@ -73,6 +75,10 @@ export declare function useForm({ schema }: UseFormOptions): {
     validatingFields: string[];
     isSubmitting: boolean;
     fieldProps: Record<string, Partial<FormField>>;
+    computedStates: Record<string, {
+    hidden: boolean;
+    disabled: boolean;
+    }>;
     }, FormRuntimeState | {
     values: Record<string, unknown>;
     errors: Record<string, string>;
@@ -80,6 +86,10 @@ export declare function useForm({ schema }: UseFormOptions): {
     validatingFields: string[];
     isSubmitting: boolean;
     fieldProps: Record<string, Partial<FormField>>;
+    computedStates: Record<string, {
+    hidden: boolean;
+    disabled: boolean;
+    }>;
     }>;
     setValue: (name: string, value: any) => Promise<void>;
     getValue: (name: string) => unknown;
@@ -88,6 +98,8 @@ export declare function useForm({ schema }: UseFormOptions): {
         values: Record<string, unknown>;
     }>;
     reset: () => void;
+    appendListItem: (name: string, defaultVal?: unknown) => void;
+    removeListItem: (name: string, index: number) => void;
 };
 
 export declare interface UseFormOptions {
