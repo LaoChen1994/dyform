@@ -2,6 +2,14 @@
 
 Vue 3 bindings for the high-performance, schema-driven dynamic form system [`pdyform`](https://github.com/LaoChen1994/pdyform).
 
+---
+
+## ⚡ Live Demo / 在线体验
+Experience the visual builder and Vue 3 renderer live in your browser:
+👉 **[https://LaoChen1994.github.io/pdyform/](https://LaoChen1994.github.io/pdyform/)**
+
+---
+
 ## Features
 
 - **Vue 3 Composition API**: First-class support for `setup` and Composition API patterns.

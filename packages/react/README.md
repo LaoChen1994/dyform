@@ -2,6 +2,14 @@
 
 React bindings for the high-performance, schema-driven dynamic form system [`pdyform`](https://github.com/LaoChen1994/pdyform).
 
+---
+
+## ⚡ Live Demo / 在线体验
+Experience the visual builder and React renderer live in your browser:
+👉 **[https://LaoChen1994.github.io/pdyform/](https://LaoChen1994.github.io/pdyform/)**
+
+---
+
 ## Features
 
 - **Seamless React Integration**: Built closely around React hooks and context.

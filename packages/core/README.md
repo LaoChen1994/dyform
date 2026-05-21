@@ -4,6 +4,14 @@ The headless, framework-agnostic data engine behind `pdyform`.
 
 This package contains the raw data structures, schema validation logic, and a fully standalone Pub-Sub `VanillaStore` that manages state natively. It operates entirely without React, Vue, or Zustand, providing an ultra-lightweight layer for complex form logic you can use anywhere.
 
+---
+
+## ⚡ Live Demo / 在线体验
+Experience the schema engine and visual designer live in your browser:
+👉 **[https://LaoChen1994.github.io/pdyform/](https://LaoChen1994.github.io/pdyform/)**
+
+---
+
 ## 📦 Installation
 
 ```bash

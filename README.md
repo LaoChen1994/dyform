@@ -5,11 +5,18 @@
 [![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[English](#english) | [中文说明](#中文说明)
+[English](#english) | [中文说明](#中文说明) | [⚡️ Live Demo](https://LaoChen1994.github.io/pdyform/)
 
 ---
 
 ## English
+
+### ⚡️ Live Demo & Visual Builder
+Experience the industrial-grade features of **pdyform** live in your browser:
+👉 **[https://LaoChen1994.github.io/pdyform/](https://LaoChen1994.github.io/pdyform/)**
+*Try dynamic FormList nested structures, our safe sandboxed AST rules evaluator, and build beautiful schemas visually.*
+
+---
 
 A high-performance, schema-driven dynamic form system with **React** and **Vue** support. It provides a framework-agnostic core logic for schema parsing and validation, allowing seamless integration across different frontend frameworks while maintaining a consistent configuration.
 
@@ -119,6 +126,13 @@ const handleSubmit = (values: any) => console.log(values);
 ---
 
 ## 中文说明
+
+### ⚡️ 在线体验与可视化生成器
+在浏览器中直接体验 **pdyform** 的工业级特性：
+👉 **[https://LaoChen1994.github.io/pdyform/](https://LaoChen1994.github.io/pdyform/)**
+*直接上手拖拽嵌套布局、配置 AST 规则联动、导出打包 Schema！*
+
+---
 
 一个高性能、基于 Schema 驱动的动态表单系统，同时支持 **React** 和 **Vue**。它提供了一个与框架无关的核心逻辑层用于 Schema 解析和表单校验，允许在不同的框架中无缝集成并保持一致的配置体验。
 

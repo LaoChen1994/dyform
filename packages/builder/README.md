@@ -12,6 +12,13 @@
 
 ---
 
+## ⚡ Live Demo / 在线体验
+Experience the visual builder live in your browser:
+👉 **[https://LaoChen1994.github.io/pdyform/](https://LaoChen1994.github.io/pdyform/)**
+*(Try dragging layout containers, configuring rules dynamically, and exporting schemas.)*
+
+---
+
 `pdyform-builder` provides a complete visual editing experience for generating complex form schemas. It comes with a beautiful three-pane layout (Component Palette, Canvas, Property Inspector), making it effortless to integrate a professional form builder into your application.
 
 ## ✨ Features
